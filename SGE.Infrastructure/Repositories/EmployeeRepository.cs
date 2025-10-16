@@ -23,6 +23,17 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     }
 
     /// <inheritdoc/>
+    public async Task<IEnumerable<Employee>> GetByDepartmentAsync(int
+        departmentId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(e => e.DepartmentId == departmentId)
+            .Include(e => e.Department)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<Employee?> GetWithDepartmentAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
@@ -31,7 +42,8 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<Employee>> GetPagedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Employee>> GetPagedAsync(int pageIndex, int pageSize,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .OrderBy(e => e.LastName)
