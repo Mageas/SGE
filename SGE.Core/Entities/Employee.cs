@@ -1,7 +1,14 @@
+using SGE.Core.Enums;
+
 namespace SGE.Core.Entities;
 
 public class Employee : BaseEntity
 {
+    /// <summary>
+    /// Gets or sets the unique ID of the employee.
+    /// </summary>
+    public string UniqueId { get; set; } = string.Empty;
+    
     /// <summary>
     /// Gets or sets the first name of the employee.
     /// </summary>
@@ -11,6 +18,11 @@ public class Employee : BaseEntity
     /// Gets or sets the last name of the employee.
     /// </summary>
     public string LastName { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Gets or sets the gender of the employee.
+    /// </summary>
+    public Gender Gender { get; set; }
     
     /// <summary>
     /// Gets or sets the email address of the employee.
