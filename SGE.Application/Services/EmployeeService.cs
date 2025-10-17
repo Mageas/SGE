@@ -182,6 +182,8 @@ public class EmployeeService(
                     continue;
                 }
 
+                hireDate = DateTime.SpecifyKind(hireDate, DateTimeKind.Utc);
+
                 var dto = new EmployeeCreateDto
                 {
                     FirstName = row["firstname"],
