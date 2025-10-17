@@ -6,6 +6,9 @@ using SGE.Application.Services;
 using SGE.Infrastructure.Data;
 using SGE.Infrastructure.Repositories;
 
+// Add encoding support for excel files
+System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Récupérer la chaine de connexion
@@ -34,6 +37,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

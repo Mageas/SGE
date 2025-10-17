@@ -1,7 +1,9 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using SGE.Application.DTOs;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
+using SGE.Application.Readers;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Services;
@@ -93,5 +95,31 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
 
         await departmentRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
+    }
+
+    /// <summary>
+    /// Import Department from Excel file
+    /// </summary>
+    /// <param name="fileUploadModel"></param>
+    /// <returns></returns>
+    public async Task<List<DepartmentDto>> ImportFile(FileUploadModel fileUploadModel)
+    {
+        var excelReader = new ExcelReader();
+        var rows = excelReader.Read(fileUploadModel.File);
+
+        var dtosList = rows.Select(row => new DepartmentCreateDto
+        {
+            Name = row["name"],
+            Code = row["code"],
+            Description = row["description"],
+        });
+
+        var createdDtos = new List<DepartmentDto>();
+        foreach (DepartmentCreateDto dto in dtosList)
+        {
+            createdDtos.Add(await CreateAsync(dto));
+        }
+
+        return createdDtos;
     }
 }

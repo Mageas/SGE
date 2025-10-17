@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using SGE.Application.DTOs;
+using SGE.Core.Entities;
 
 namespace SGE.Application.Interfaces.Services;
 
@@ -46,4 +48,11 @@ public interface IDepartmentService
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
     /// <returns>A task representing the asynchronous operation. The task result indicates whether the deletion was successful.</returns>
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Import Department from Excel file
+    /// </summary>
+    /// <param name="fileUploadModel"></param>
+    /// <returns></returns>
+    Task<List<DepartmentDto>> ImportFile(FileUploadModel fileUploadModel);
 }

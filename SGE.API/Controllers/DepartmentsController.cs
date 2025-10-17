@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs;
 using SGE.Application.Interfaces.Services;
+using SGE.Core.Entities;
 
 namespace SGE.API.Controllers;
 
@@ -90,5 +91,23 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
         }
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Import from a file
+    /// </summary>
+    /// <param name="fileUploadModel"></param>
+    /// <returns></returns>
+    [HttpPost("import")]
+    public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
+    {
+        if (fileUploadModel == null)
+        {
+            return BadRequest();
+        }
+
+        var createdDtos = await departmentService.ImportFile(fileUploadModel);
+
+        return Ok(createdDtos);
     }
 }
