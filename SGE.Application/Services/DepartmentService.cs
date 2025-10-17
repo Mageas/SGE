@@ -4,6 +4,7 @@ using SGE.Application.DTOs;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
 using SGE.Application.Readers;
+using SGE.Application.Writers;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Services;
@@ -121,5 +122,17 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
         }
 
         return createdDtos;
+    }
+    
+    /// <summary>
+    /// Export Departments to Excel
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)
+    {
+        var excelWriter = new ExcelWriter();
+        var departments = await GetAllAsync(cancellationToken);
+        return excelWriter.Write(departments.ToList(), "Departments");
     }
 }

@@ -103,11 +103,28 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     {
         if (fileUploadModel == null)
         {
-            return BadRequest();
+            return BadRequest("No file uploaded");
         }
 
         var createdDtos = await departmentService.ImportFile(fileUploadModel);
 
         return Ok(createdDtos);
+    }
+    
+    /// <summary>
+    /// Export Departments to Excel
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(CancellationToken cancellationToken)
+    {
+        var excelData = await departmentService.ExportToExcelAsync(cancellationToken);
+        
+        return File(
+            excelData,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"Departments_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+        );
     }
 }

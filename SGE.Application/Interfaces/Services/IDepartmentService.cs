@@ -55,4 +55,11 @@ public interface IDepartmentService
     /// <param name="fileUploadModel"></param>
     /// <returns></returns>
     Task<List<DepartmentDto>> ImportFile(FileUploadModel fileUploadModel);
+    
+    /// <summary>
+    /// Export Departments to Excel
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken);
 }
