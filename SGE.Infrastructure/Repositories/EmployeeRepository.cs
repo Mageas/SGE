@@ -8,22 +8,22 @@ namespace SGE.Infrastructure.Repositories;
 public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 {
     /// <summary>
-    /// Represents a repository for performing data access operations specific to the <see cref="Employee"/> entity.
-    /// Implements the <see cref="IEmployeeRepository"/> interface and extends <see cref="Repository{T}"/>.
-    /// Provides additional methods for retrieving employee data based on specific criteria.
+    ///     Represents a repository for performing data access operations specific to the <see cref="Employee" /> entity.
+    ///     Implements the <see cref="IEmployeeRepository" /> interface and extends <see cref="Repository{T}" />.
+    ///     Provides additional methods for retrieving employee data based on specific criteria.
     /// </summary>
     public EmployeeRepository(ApplicationDbContext context) : base(context)
     {
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public new async Task<IEnumerable<Employee>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await
-            _dbSet.AsNoTracking().Include(e => e.Department).ToListAsync(cancellationToken: cancellationToken);
+            _dbSet.AsNoTracking().Include(e => e.Department).ToListAsync(cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public new async Task<Employee?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
@@ -31,7 +31,7 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Employee?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _dbSet
@@ -39,13 +39,13 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             .FirstOrDefaultAsync(e => e.Email == email, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Employee?> GetByUniqueIdAsync(string uniqueId, CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(e => e.UniqueId == uniqueId, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<IEnumerable<Employee>> GetByDepartmentAsync(int departmentId,
         CancellationToken cancellationToken = default)
     {
@@ -56,7 +56,7 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             .ToListAsync(cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Employee?> GetWithDepartmentAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
@@ -64,7 +64,7 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<IEnumerable<Employee>> GetPagedAsync(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {

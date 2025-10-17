@@ -14,10 +14,13 @@ public class EmployeeService(
     IMapper mapper) : IEmployeeService
 {
     /// <summary>
-    /// Asynchronously retrieves all employees from the repository and maps them to a collection of EmployeeDto.
+    ///     Asynchronously retrieves all employees from the repository and maps them to a collection of EmployeeDto.
     /// </summary>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of EmployeeDto objects.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains a collection of EmployeeDto
+    ///     objects.
+    /// </returns>
     public async Task<IEnumerable<EmployeeDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var list = await employeeRepository.GetAllAsync(cancellationToken);
@@ -25,12 +28,13 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously retrieves an employee by their unique identifier and maps it to an EmployeeDto.
+    ///     Asynchronously retrieves an employee by their unique identifier and maps it to an EmployeeDto.
     /// </summary>
     /// <param name="id">The unique identifier of the employee.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains an EmployeeDto object if found; otherwise, null.
+    ///     A task that represents the asynchronous operation. The task result contains an EmployeeDto object if found;
+    ///     otherwise, null.
     /// </returns>
     public async Task<EmployeeDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
@@ -39,11 +43,14 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously retrieves an employee by their email address and maps it to an EmployeeDto.
+    ///     Asynchronously retrieves an employee by their email address and maps it to an EmployeeDto.
     /// </summary>
     /// <param name="email">The email address of the employee to retrieve.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the EmployeeDto if found; otherwise, null.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains the EmployeeDto if found;
+    ///     otherwise, null.
+    /// </returns>
     public async Task<EmployeeDto?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var emp = await employeeRepository.GetByEmailAsync(email, cancellationToken);
@@ -51,11 +58,14 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously retrieves employees belonging to a specific department and maps them to a collection of EmployeeDto.
+    ///     Asynchronously retrieves employees belonging to a specific department and maps them to a collection of EmployeeDto.
     /// </summary>
     /// <param name="departmentId">The unique identifier of the department whose employees should be retrieved.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of EmployeeDto objects associated with the specified department.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains a collection of EmployeeDto
+    ///     objects associated with the specified department.
+    /// </returns>
     public async Task<IEnumerable<EmployeeDto>> GetByDepartmentAsync(int departmentId,
         CancellationToken cancellationToken = default)
     {
@@ -64,26 +74,23 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously creates a new employee in the repository based on the provided data transfer object.
+    ///     Asynchronously creates a new employee in the repository based on the provided data transfer object.
     /// </summary>
     /// <param name="dto">The data transfer object containing details of the employee to be created.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created EmployeeDto object.</returns>
-    /// <exception cref="ApplicationException">Thrown if the specified department does not exist or if the email is already associated with another employee.</exception>
+    /// <exception cref="ApplicationException">
+    ///     Thrown if the specified department does not exist or if the email is already
+    ///     associated with another employee.
+    /// </exception>
     public async Task<EmployeeDto> CreateAsync(EmployeeCreateDto dto,
         CancellationToken cancellationToken = default)
     {
         var department = await departmentRepository.GetByIdAsync(dto.DepartmentId, cancellationToken);
-        if (department == null)
-        {
-            throw new ApplicationException("Il n'existe aucun departement avec cet identifiant");
-        }
+        if (department == null) throw new ApplicationException("Il n'existe aucun departement avec cet identifiant");
 
         var existingEmployee = await employeeRepository.GetByEmailAsync(dto.Email, cancellationToken);
-        if (existingEmployee != null)
-        {
-            throw new ApplicationException("Cet email existe déjà pour un autre employée");
-        }
+        if (existingEmployee != null) throw new ApplicationException("Cet email existe déjà pour un autre employée");
 
         var entity = mapper.Map<Employee>(dto);
 
@@ -94,19 +101,19 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously updates an employee's information in the repository using the provided data.
+    ///     Asynchronously updates an employee's information in the repository using the provided data.
     /// </summary>
     /// <param name="id">The unique identifier of the employee to update.</param>
     /// <param name="dto">An object containing the updated details of the employee.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result indicates whether the update operation was successful.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result indicates whether the update operation was
+    ///     successful.
+    /// </returns>
     public async Task<bool> UpdateAsync(int id, EmployeeUpdateDto dto, CancellationToken cancellationToken = default)
     {
         var entity = await employeeRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         mapper.Map(dto, entity);
         await employeeRepository.UpdateAsync(entity, cancellationToken);
@@ -114,63 +121,25 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Asynchronously deletes an employee by their unique identifier.
+    ///     Asynchronously deletes an employee by their unique identifier.
     /// </summary>
     /// <param name="id">The unique identifier of the employee to be deleted.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a boolean value indicating whether the deletion was successful.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains a boolean value indicating whether
+    ///     the deletion was successful.
+    /// </returns>
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await employeeRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         await employeeRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
     }
 
     /// <summary>
-    /// Tries to generate a unique id until it finds one that is not already in use.
-    /// If it fails to find a unique id after 10 tries, it throws an exception.
-    /// </summary>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
-    /// <param name="departmentId"></param>
-    /// <returns>A unique id for the employee.</returns>
-    /// <exception cref="ApplicationException"></exception>
-    private async Task<string> GenerateUniqueId(string firstName, string lastName, int departmentId)
-    {
-        var chars = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        var rand = new Random();
-        var num = rand.Next(0, chars.Length);
-
-        string FormatUniqueId() =>
-            (firstName.Substring(0, int.Clamp(firstName.Length, 0, 2)) +
-             lastName.Substring(0, int.Clamp(lastName.Length, 0, 2)) + chars[num] + departmentId).ToUpper();
-
-        var uniqueId = FormatUniqueId();
-
-        var retry = 0;
-        while (await employeeRepository.GetByUniqueIdAsync(uniqueId) != null)
-        {
-            num = rand.Next(0, chars.Length);
-            uniqueId = FormatUniqueId();
-
-            if (retry >= 10)
-            {
-                throw new ApplicationException("Impossible de générer un identifiant unique");
-            }
-
-            retry++;
-        }
-
-        return uniqueId;
-    }
-
-    /// <summary>
-    /// Import Department from Excel file
+    ///     Import Department from Excel file
     /// </summary>
     /// <param name="fileUploadModel"></param>
     /// <returns></returns>
@@ -224,7 +193,7 @@ public class EmployeeService(
                     Position = row["position"],
                     Salary = salary,
                     DepartmentId = departmentId,
-                    HireDate = hireDate,
+                    HireDate = hireDate
                 };
 
                 var created = await CreateAsync(dto);
@@ -246,7 +215,7 @@ public class EmployeeService(
     }
 
     /// <summary>
-    /// Export Employee to Excel
+    ///     Export Employee to Excel
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -255,5 +224,42 @@ public class EmployeeService(
         var excelWriter = new ExcelWriter();
         var departments = await GetAllAsync(cancellationToken);
         return excelWriter.Write(departments.ToList(), "Employees");
+    }
+
+    /// <summary>
+    ///     Tries to generate a unique id until it finds one that is not already in use.
+    ///     If it fails to find a unique id after 10 tries, it throws an exception.
+    /// </summary>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="departmentId"></param>
+    /// <returns>A unique id for the employee.</returns>
+    /// <exception cref="ApplicationException"></exception>
+    private async Task<string> GenerateUniqueId(string firstName, string lastName, int departmentId)
+    {
+        var chars = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var rand = new Random();
+        var num = rand.Next(0, chars.Length);
+
+        string FormatUniqueId()
+        {
+            return (firstName.Substring(0, int.Clamp(firstName.Length, 0, 2)) +
+                    lastName.Substring(0, int.Clamp(lastName.Length, 0, 2)) + chars[num] + departmentId).ToUpper();
+        }
+
+        var uniqueId = FormatUniqueId();
+
+        var retry = 0;
+        while (await employeeRepository.GetByUniqueIdAsync(uniqueId) != null)
+        {
+            num = rand.Next(0, chars.Length);
+            uniqueId = FormatUniqueId();
+
+            if (retry >= 10) throw new ApplicationException("Impossible de générer un identifiant unique");
+
+            retry++;
+        }
+
+        return uniqueId;
     }
 }

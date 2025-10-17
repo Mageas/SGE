@@ -6,9 +6,24 @@ namespace SGE.Application.DTOs.Employees;
 public partial class EmployeeCreateDto
 {
     /// <summary>
-    /// Gets or sets the first name of the employee.
+    ///     Gets or sets the email address of the employee.
     /// </summary>
-    private readonly string _firstName = String.Empty;
+    private readonly string _email = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the first name of the employee.
+    /// </summary>
+    private readonly string _firstName = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the last name of the employee.
+    /// </summary>
+    private readonly string _lastName = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the gender of the employee.
+    /// </summary>
+    private readonly int _gender;
 
     public string FirstName
     {
@@ -16,37 +31,22 @@ public partial class EmployeeCreateDto
         init
         {
             if (value.Length <= 2)
-            {
                 throw new ArgumentException("First name must be at least 2 characters long.", nameof(value));
-            }
 
             _firstName = value;
         }
     }
-
-    /// <summary>
-    /// Gets or sets the last name of the employee.
-    /// </summary>
-    private readonly string _lastName = String.Empty;
 
     public string LastName
     {
         get => _lastName;
         init
         {
-            if (value.Length <= 2)
-            {
-                throw new ArgumentException("Last name must be at least 2 characters long.");
-            }
+            if (value.Length <= 2) throw new ArgumentException("Last name must be at least 2 characters long.");
 
             _lastName = value;
         }
     }
-
-    /// <summary>
-    /// Gets or sets the gender of the employee.
-    /// </summary>
-    private int _gender;
 
     public int Gender
     {
@@ -54,18 +54,11 @@ public partial class EmployeeCreateDto
         init
         {
             if (!Enum.IsDefined(typeof(Gender), value))
-            {
                 throw new ArgumentOutOfRangeException("Gender value must be a valid Gender enum value.");
-            }
 
             _gender = value;
         }
     }
-
-    /// <summary>
-    /// Gets or sets the email address of the employee.
-    /// </summary>
-    private readonly string _email = String.Empty;
 
     public string Email
     {
@@ -73,42 +66,39 @@ public partial class EmployeeCreateDto
         init
         {
             var regex = EmailRegex();
-            if (!regex.IsMatch(value))
-            {
-                throw new ArgumentException("Email must be a valid email.");
-            }
+            if (!regex.IsMatch(value)) throw new ArgumentException("Email must be a valid email.");
 
             _email = value;
         }
     }
 
     /// <summary>
-    /// Gets or sets the phone number associated with the employee.
+    ///     Gets or sets the phone number associated with the employee.
     /// </summary>
     public string PhoneNumber { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the address of the employee.
+    ///     Gets or sets the address of the employee.
     /// </summary>
     public string Address { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the position or job title of the employee.
+    ///     Gets or sets the position or job title of the employee.
     /// </summary>
     public string Position { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the salary of the employee.
+    ///     Gets or sets the salary of the employee.
     /// </summary>
     public decimal Salary { get; set; }
 
     /// <summary>
-    /// Gets or sets the name of the department associated with the employee.
+    ///     Gets or sets the name of the department associated with the employee.
     /// </summary>
     public int DepartmentId { get; set; }
 
     /// <summary>
-    /// Gets or sets the date the employee was hired.
+    ///     Gets or sets the date the employee was hired.
     /// </summary>
     public DateTime HireDate { get; set; }
 

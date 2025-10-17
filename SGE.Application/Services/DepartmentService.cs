@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using SGE.Application.DTOs.Departments;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
@@ -12,7 +11,7 @@ namespace SGE.Application.Services;
 public class DepartmentService(IDepartmentRepository departmentRepository, IMapper mapper) : IDepartmentService
 {
     /// <summary>
-    /// Retrieves all department records asynchronously.
+    ///     Retrieves all department records asynchronously.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A collection of department data transfer objects.</returns>
@@ -23,7 +22,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     }
 
     /// <summary>
-    /// Retrieves a department record by its identifier asynchronously.
+    ///     Retrieves a department record by its identifier asynchronously.
     /// </summary>
     /// <param name="id">The unique identifier of the department.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -35,7 +34,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     }
 
     /// <summary>
-    /// Creates a new department record asynchronously.
+    ///     Creates a new department record asynchronously.
     /// </summary>
     /// <param name="dto">The data transfer object containing the details of the department to be created.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -44,16 +43,10 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<DepartmentDto> CreateAsync(DepartmentCreateDto dto, CancellationToken cancellationToken = default)
     {
         var existingName = await departmentRepository.GetByNameAsync(dto.Name, cancellationToken);
-        if (existingName != null)
-        {
-            throw new ApplicationException("Department name already exists");
-        }
+        if (existingName != null) throw new ApplicationException("Department name already exists");
 
         var existingCode = await departmentRepository.GetByCodeAsync(dto.Code, cancellationToken);
-        if (existingCode != null)
-        {
-            throw new ApplicationException("Department code already exists");
-        }
+        if (existingCode != null) throw new ApplicationException("Department code already exists");
 
         var entity = mapper.Map<Department>(dto);
         await departmentRepository.AddAsync(entity, cancellationToken);
@@ -61,7 +54,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     }
 
     /// <summary>
-    /// Updates an existing department record asynchronously.
+    ///     Updates an existing department record asynchronously.
     /// </summary>
     /// <param name="id">The unique identifier of the department to update.</param>
     /// <param name="dto">The data transfer object containing updated information for the department.</param>
@@ -70,10 +63,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<bool> UpdateAsync(int id, DepartmentUpdateDto dto, CancellationToken cancellationToken = default)
     {
         var entity = await departmentRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         mapper.Map(dto, entity);
         await departmentRepository.UpdateAsync(entity, cancellationToken);
@@ -81,7 +71,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     }
 
     /// <summary>
-    /// Deletes a department record by its identifier asynchronously.
+    ///     Deletes a department record by its identifier asynchronously.
     /// </summary>
     /// <param name="id">The unique identifier of the department to delete.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -89,17 +79,14 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await departmentRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         await departmentRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
     }
 
     /// <summary>
-    /// Import Department from Excel file
+    ///     Import Department from Excel file
     /// </summary>
     /// <param name="fileUploadModel"></param>
     /// <returns></returns>
@@ -112,20 +99,17 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
         {
             Name = row["name"],
             Code = row["code"],
-            Description = row["description"],
+            Description = row["description"]
         });
 
         var createdDtos = new List<DepartmentDto>();
-        foreach (DepartmentCreateDto dto in dtosList)
-        {
-            createdDtos.Add(await CreateAsync(dto));
-        }
+        foreach (var dto in dtosList) createdDtos.Add(await CreateAsync(dto));
 
         return createdDtos;
     }
-    
+
     /// <summary>
-    /// Export Departments to Excel
+    ///     Export Departments to Excel
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>

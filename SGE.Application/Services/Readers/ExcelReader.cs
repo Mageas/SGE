@@ -1,13 +1,13 @@
+using System.Data;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
-using System.Data;
 
 namespace SGE.Application.Services.Readers;
 
 public class ExcelReader
 {
     /// <summary>
-    /// Read the Excel file and return the data in a list.
+    ///     Read the Excel file and return the data in a list.
     /// </summary>
     /// <param name="formFile"></param>
     /// <returns></returns>
@@ -24,7 +24,7 @@ public class ExcelReader
 
             // Retrieve column names
             var columnNames = new List<string>();
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (var i = 0; i < table.Columns.Count; i++)
             {
                 var columnName = table.Rows[0][i]?.ToString() ?? $"Column{i}";
                 columnNames.Add(columnName.ToLower());
@@ -37,9 +37,7 @@ public class ExcelReader
                 var rowData = new Dictionary<string, string>();
 
                 for (var colIndex = 0; colIndex < columnNames.Count; colIndex++)
-                {
                     rowData[columnNames[colIndex]] = row[colIndex]?.ToString() ?? string.Empty;
-                }
 
                 allData.Add(rowData);
             }
