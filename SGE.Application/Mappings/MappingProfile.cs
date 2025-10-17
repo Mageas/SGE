@@ -1,5 +1,6 @@
 using AutoMapper;
-using SGE.Application.DTOs;
+using SGE.Application.DTOs.Departments;
+using SGE.Application.DTOs.Employees;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Mappings;

@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 
-namespace SGE.Application.Writers;
+namespace SGE.Application.Services.Writers;
 
 public class ExcelWriter
 {

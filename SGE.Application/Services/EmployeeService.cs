@@ -1,9 +1,9 @@
 using AutoMapper;
-using SGE.Application.DTOs;
+using SGE.Application.DTOs.Employees;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
-using SGE.Application.Readers;
-using SGE.Application.Writers;
+using SGE.Application.Services.Readers;
+using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Services;

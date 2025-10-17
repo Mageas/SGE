@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using SGE.Core.Enums;
 
-namespace SGE.Application.DTOs;
+namespace SGE.Application.DTOs.Employees;
 
 public partial class EmployeeCreateDto
 {
@@ -78,7 +78,7 @@ public partial class EmployeeCreateDto
                 throw new ArgumentException("Email must be a valid email.");
             }
 
-            _lastName = value;
+            _email = value;
         }
     }
 

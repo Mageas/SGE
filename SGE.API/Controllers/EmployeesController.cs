@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SGE.Application.DTOs;
+using SGE.Application.DTOs.Employees;
 using SGE.Application.Interfaces.Services;
 using SGE.Core.Entities;
 

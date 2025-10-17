@@ -2,7 +2,7 @@ using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using System.Data;
 
-namespace SGE.Application.Readers;
+namespace SGE.Application.Services.Readers;
 
 public class ExcelReader
 {

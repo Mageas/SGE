@@ -1,6 +1,6 @@
-namespace SGE.Application.DTOs;
+namespace SGE.Application.DTOs.Departments;
 
-public class DepartmentCreateDto
+public class DepartmentUpdateDto
 {
     /// <summary>
     /// Gets or sets the name of the department.
@@ -18,26 +18,6 @@ public class DepartmentCreateDto
             }
 
             _name = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the code that uniquely identifies the department
-    /// </summary>
-    private readonly string _code = String.Empty;
-
-    public string Code
-    {
-        get => _code;
-        init
-        {
-            if (value.Length <= 2 || value.Length > 10)
-
-            {
-                throw new ArgumentException("Code must be at least 2 characters long and max 10 characters long.");
-            }
-
-            _code = value;
         }
     }
 

@@ -1,10 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using SGE.Application.DTOs;
+using SGE.Application.DTOs.Departments;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
-using SGE.Application.Readers;
-using SGE.Application.Writers;
+using SGE.Application.Services.Readers;
+using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Services;

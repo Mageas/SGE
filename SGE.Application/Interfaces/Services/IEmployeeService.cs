@@ -1,4 +1,4 @@
-using SGE.Application.DTOs;
+using SGE.Application.DTOs.Employees;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Interfaces.Services;
