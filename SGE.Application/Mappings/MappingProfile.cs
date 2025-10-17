@@ -1,6 +1,8 @@
 using AutoMapper;
+using SGE.Application.DTOs.Attendances;
 using SGE.Application.DTOs.Departments;
 using SGE.Application.DTOs.Employees;
+using SGE.Application.DTOs.LeaveRequests;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Mappings;
@@ -23,5 +25,23 @@ public class MappingProfile : Profile
         CreateMap<EmployeeCreateDto, Employee>();
         CreateMap<EmployeeUpdateDto, Employee>().ForAllMembers(opts =>
             opts.Condition((src, dest, srcMember) => srcMember != null)); // ignore nulls
+
+        // Attendance mappings
+        CreateMap<Attendance, AttendanceDto>()
+            .ForMember(dest => dest.EmployeeName, opt =>
+                opt.MapFrom(src =>
+                    src.Employee != null ? $"{src.Employee.FirstName} {src.Employee.LastName}" : string.Empty));
+        CreateMap<AttendanceCreateDto, Attendance>();
+        CreateMap<AttendanceUpdateDto, Attendance>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        // LeaveRequest mappings
+        CreateMap<LeaveRequest, LeaveRequestDto>()
+            .ForMember(dest => dest.EmployeeName, opt =>
+                opt.MapFrom(src =>
+                    src.Employee != null ? $"{src.Employee.FirstName} {src.Employee.LastName}" : string.Empty));
+        CreateMap<LeaveRequestCreateDto, LeaveRequest>();
+        CreateMap<LeaveRequestUpdateDto, LeaveRequest>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }
