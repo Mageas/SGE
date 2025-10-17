@@ -5,7 +5,21 @@ public class DepartmentUpdateDto
     /// <summary>
     /// Gets or sets the name of the department.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    private readonly string _name = String.Empty;
+
+    public string Name
+    {
+        get => _name;
+        init
+        {
+            if (value.Length <= 2)
+            {
+                throw new ArgumentException("Name must be at least 2 characters long.");
+            }
+
+            _name = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the description of the department.

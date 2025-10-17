@@ -5,12 +5,41 @@ public class DepartmentCreateDto
     /// <summary>
     /// Gets or sets the name of the department.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    private readonly string _name = String.Empty;
+
+    public string Name
+    {
+        get => _name;
+        init
+        {
+            if (value.Length <= 2)
+            {
+                throw new ArgumentException("Name must be at least 2 characters long.");
+            }
+
+            _name = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the code that uniquely identifies the department
     /// </summary>
-    public string Code { get; set; } = string.Empty;
+    private readonly string _code = String.Empty;
+
+    public string Code
+    {
+        get => _code;
+        init
+        {
+            if (value.Length <= 2 || value.Length > 10)
+
+            {
+                throw new ArgumentException("Code must be at least 2 characters long and max 10 characters long.");
+            }
+
+            _code = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the description of the department.
