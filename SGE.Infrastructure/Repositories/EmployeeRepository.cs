@@ -17,9 +17,26 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     }
 
     /// <inheritdoc/>
+    public new async Task<IEnumerable<Employee>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await
+            _dbSet.AsNoTracking().Include(e => e.Department).ToListAsync(cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public new async Task<Employee?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(e => e.Department)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<Employee?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(e => e.Email == email, cancellationToken);
+        return await _dbSet
+            .Include(e => e.Department)
+            .FirstOrDefaultAsync(e => e.Email == email, cancellationToken);
     }
 
     /// <inheritdoc/>
