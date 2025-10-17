@@ -1,3 +1,5 @@
+using SGE.Core.Enums;
+
 namespace SGE.Application.DTOs;
 
 public class EmployeeCreateDto
@@ -6,7 +8,7 @@ public class EmployeeCreateDto
     /// Gets or sets the first name of the employee.
     /// </summary>
     public string FirstName { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the last name of the employee.
     /// </summary>
@@ -15,7 +17,21 @@ public class EmployeeCreateDto
     /// <summary>
     /// Gets or sets the gender of the employee.
     /// </summary>
-    public int Gender { get; set; }
+    private int _gender;
+
+    public int Gender
+    {
+        get => _gender;
+        set
+        {
+            if (!Enum.IsDefined(typeof(Gender), value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Gender value must be a valid Gender enum value.");
+            }
+
+            _gender = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the email address of the employee.

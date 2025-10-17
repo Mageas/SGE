@@ -178,27 +178,70 @@ public class EmployeeService(
         var excelReader = new ExcelReader();
         var rows = excelReader.Read(fileUploadModel.File);
 
-        var dtosList = rows.Select(row => new EmployeeCreateDto
-        {
-            FirstName = row["firstname"],
-            LastName = row["lastname"],
-            Gender = Int32.Parse(row["gender"]),
-            Email = row["email"],
-            PhoneNumber = row["phonenumber"],
-            Address = row["address"],
-            Position = row["position"],
-            Salary = decimal.Parse(row["salary"]),
-            DepartmentId = int.Parse(row["departmentid"]),
-            HireDate = DateTime.SpecifyKind(DateTime.Parse(row["hiredate"]), DateTimeKind.Utc),
-        });
-
         var createdDtos = new List<EmployeeDto>();
-        foreach (EmployeeCreateDto dto in dtosList)
+        var errors = new List<string>();
+
+        for (var i = 0; i < rows.Count; i++)
         {
-            createdDtos.Add(await CreateAsync(dto));
+            var row = rows[i];
+            var rowNumber = i + 2;
+
+            try
+            {
+                if (!int.TryParse(row["gender"], out var gender))
+                {
+                    errors.Add($"Ligne {rowNumber}: Gender invalide '{row["gender"]}'");
+                    continue;
+                }
+
+                if (!decimal.TryParse(row["salary"], out var salary))
+                {
+                    errors.Add($"Ligne {rowNumber}: Salary invalide '{row["salary"]}'");
+                    continue;
+                }
+
+                if (!int.TryParse(row["departmentid"], out var departmentId))
+                {
+                    errors.Add($"Ligne {rowNumber}: DepartmentId invalide '{row["departmentid"]}'");
+                    continue;
+                }
+
+                if (!DateTime.TryParse(row["hiredate"], out var hireDate))
+                {
+                    errors.Add($"Ligne {rowNumber}: HireDate invalide '{row["hiredate"]}'");
+                    continue;
+                }
+
+                var dto = new EmployeeCreateDto
+                {
+                    FirstName = row["firstname"],
+                    LastName = row["lastname"],
+                    Gender = gender,
+                    Email = row["email"],
+                    PhoneNumber = row["phonenumber"],
+                    Address = row["address"],
+                    Position = row["position"],
+                    Salary = salary,
+                    DepartmentId = departmentId,
+                    HireDate = hireDate,
+                };
+
+                var created = await CreateAsync(dto);
+                createdDtos.Add(created);
+            }
+            catch (ApplicationException ex)
+            {
+                errors.Add($"Ligne {rowNumber}: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"Ligne {rowNumber}: Erreur inattendue - {ex.Message}");
+            }
         }
 
-        return createdDtos;
+        return errors.Any()
+            ? throw new ApplicationException($"Erreurs lors de l'import:\n{string.Join("\n", errors)}")
+            : createdDtos;
     }
 
     /// <summary>
