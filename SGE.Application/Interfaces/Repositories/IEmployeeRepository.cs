@@ -18,6 +18,15 @@ public interface IEmployeeRepository : IRepository<Employee>
     Task<Employee?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves an employee entity based on the provided unique id.
+    /// </summary>
+    /// <param name="email">The email address of the employee to be retrieved.</param>
+    /// <param name="cancellationToken">A cancellation token to notify task cancellation.</param>
+    /// <returns>A task representing the asynchronous operation.
+    /// The task result contains the employee that matches the specified email address, or null if no match is found.</returns>
+    Task<Employee?> GetByUniqueIdAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Retrieves a collection of employee entities that belong to the specified department.
     /// </summary>
     /// <param name="departmentId">The identifier of the department for which to retrieve employees.</param>

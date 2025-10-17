@@ -23,6 +23,12 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     }
 
     /// <inheritdoc/>
+    public async Task<Employee?> GetByUniqueIdAsync(string uniqueId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.FirstOrDefaultAsync(e => e.UniqueId == uniqueId, cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<IEnumerable<Employee>> GetByDepartmentAsync(int departmentId,
         CancellationToken cancellationToken = default)
     {

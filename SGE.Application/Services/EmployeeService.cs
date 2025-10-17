@@ -85,12 +85,7 @@ public class EmployeeService(
 
         var entity = mapper.Map<Employee>(dto);
 
-        var chars = "$%#@!*abcdefghijklmnopqrstuvwxyz1234567890?;:ABCDEFGHIJKLMNOPQRSTUVWXYZ^&";
-        var rand = new Random();
-        var num = rand.Next(0, chars.Length);
-
-        var uniqueId = dto.FirstName.Substring(0, 2) + dto.LastName.Substring(0, 2) + chars[num] + dto.DepartmentId;
-        entity.UniqueId = uniqueId.ToUpper();
+        entity.UniqueId = await GenerateUniqueId(dto.FirstName, dto.LastName, dto.DepartmentId);
 
         await employeeRepository.AddAsync(entity, cancellationToken);
         return mapper.Map<EmployeeDto>(entity);
@@ -132,5 +127,42 @@ public class EmployeeService(
 
         await employeeRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
+    }
+
+    /// <summary>
+    /// Tries to generate a unique id until it finds one that is not already in use.
+    /// If it fails to find a unique id after 10 tries, it throws an exception.
+    /// </summary>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="departmentId"></param>
+    /// <returns>A unique id for the employee.</returns>
+    /// <exception cref="ApplicationException"></exception>
+    private async Task<string> GenerateUniqueId(string firstName, string lastName, int departmentId)
+    {
+        var chars = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var rand = new Random();
+        var num = rand.Next(0, chars.Length);
+
+        string FormatUniqueId() =>
+            (firstName.Substring(0, 2) + lastName.Substring(0, 2) + chars[num] + departmentId).ToUpper();
+
+        var uniqueId = FormatUniqueId();
+
+        var retry = 0;
+        while (await employeeRepository.GetByUniqueIdAsync(uniqueId) != null)
+        {
+            num = rand.Next(0, chars.Length);
+            uniqueId = FormatUniqueId();
+
+            if (retry >= 10)
+            {
+                throw new ApplicationException("Impossible de générer un identifiant unique");
+            }
+
+            retry++;
+        }
+
+        return uniqueId;
     }
 }
