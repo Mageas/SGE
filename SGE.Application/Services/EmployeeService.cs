@@ -147,7 +147,8 @@ public class EmployeeService(
         var num = rand.Next(0, chars.Length);
 
         string FormatUniqueId() =>
-            (firstName.Substring(0, 2) + lastName.Substring(0, 2) + chars[num] + departmentId).ToUpper();
+            (firstName.Substring(0, int.Clamp(firstName.Length, 0, 2)) +
+             lastName.Substring(0, int.Clamp(lastName.Length, 0, 2)) + chars[num] + departmentId).ToUpper();
 
         var uniqueId = FormatUniqueId();
 

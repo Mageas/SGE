@@ -149,6 +149,11 @@ public class EmployeesController(IEmployeeService employeeService) :
             return BadRequest("No file uploaded");
         }
 
+        if (fileUploadModel.File.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        {
+            return BadRequest("File is not a valid Excel file");
+        }
+
         var createdDtos = await employeeService.ImportFile(fileUploadModel);
 
         return Ok(createdDtos);
