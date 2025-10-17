@@ -1,4 +1,5 @@
 using SGE.Application.DTOs;
+using SGE.Core.Entities;
 
 namespace SGE.Application.Interfaces.Services;
 
@@ -77,4 +78,18 @@ public interface IEmployeeService
     /// A task that represents the asynchronous operation. The task result contains a boolean indicating whether the deletion was successful.
     /// </returns>
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Import Employee from Excel file
+    /// </summary>
+    /// <param name="fileUploadModel"></param>
+    /// <returns></returns>
+    Task<List<EmployeeDto>> ImportFile(FileUploadModel fileUploadModel);
+
+    /// <summary>
+    /// Export Departments to Excel
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken);
 }

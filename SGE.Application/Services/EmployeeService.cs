@@ -2,6 +2,8 @@ using AutoMapper;
 using SGE.Application.DTOs;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
+using SGE.Application.Readers;
+using SGE.Application.Writers;
 using SGE.Core.Entities;
 
 namespace SGE.Application.Services;
@@ -164,5 +166,50 @@ public class EmployeeService(
         }
 
         return uniqueId;
+    }
+
+    /// <summary>
+    /// Import Department from Excel file
+    /// </summary>
+    /// <param name="fileUploadModel"></param>
+    /// <returns></returns>
+    public async Task<List<EmployeeDto>> ImportFile(FileUploadModel fileUploadModel)
+    {
+        var excelReader = new ExcelReader();
+        var rows = excelReader.Read(fileUploadModel.File);
+
+        var dtosList = rows.Select(row => new EmployeeCreateDto
+        {
+            FirstName = row["firstname"],
+            LastName = row["lastname"],
+            Gender = Int32.Parse(row["gender"]),
+            Email = row["email"],
+            PhoneNumber = row["phonenumber"],
+            Address = row["address"],
+            Position = row["position"],
+            Salary = decimal.Parse(row["salary"]),
+            DepartmentId = int.Parse(row["departmentid"]),
+            HireDate = DateTime.SpecifyKind(DateTime.Parse(row["hiredate"]), DateTimeKind.Utc),
+        });
+
+        var createdDtos = new List<EmployeeDto>();
+        foreach (EmployeeCreateDto dto in dtosList)
+        {
+            createdDtos.Add(await CreateAsync(dto));
+        }
+
+        return createdDtos;
+    }
+
+    /// <summary>
+    /// Export Employee to Excel
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)
+    {
+        var excelWriter = new ExcelWriter();
+        var departments = await GetAllAsync(cancellationToken);
+        return excelWriter.Write(departments.ToList(), "Employees");
     }
 }
