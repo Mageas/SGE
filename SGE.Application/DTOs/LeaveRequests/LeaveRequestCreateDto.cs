@@ -1,46 +1,21 @@
-using SGE.Core.Enums;
+using System.Text.Json.Serialization;
 
 namespace SGE.Application.DTOs.LeaveRequests;
 
 public class LeaveRequestCreateDto
 {
-    private readonly int _leaveType;
-    private readonly DateTime _startDate;
-    private readonly DateTime _endDate;
+    [JsonPropertyName("leaveType")]
+    public int LeaveType { get; set; }
 
-    public int LeaveType
-    {
-        get => _leaveType;
-        init
-        {
-            if (!Enum.IsDefined(typeof(LeaveType), value))
-                throw new ArgumentOutOfRangeException(nameof(value), "LeaveType value must be a valid LeaveType enum value.");
-            _leaveType = value;
-        }
-    }
+    [JsonPropertyName("startDate")]
+    public DateTime StartDate { get; set; }
 
-    public DateTime StartDate
-    {
-        get => _startDate;
-        init
-        {
-            if (value < DateTime.UtcNow.Date)
-                throw new ArgumentException("StartDate cannot be in the past.", nameof(value));
-            _startDate = value;
-        }
-    }
+    [JsonPropertyName("endDate")]
+    public DateTime EndDate { get; set; }
 
-    public DateTime EndDate
-    {
-        get => _endDate;
-        init
-        {
-            if (value < _startDate)
-                throw new ArgumentException("EndDate must be after StartDate.", nameof(value));
-            _endDate = value;
-        }
-    }
-
+    [JsonPropertyName("reason")]
     public string Reason { get; set; } = string.Empty;
+
+    [JsonPropertyName("employeeId")]
     public int EmployeeId { get; set; }
 }

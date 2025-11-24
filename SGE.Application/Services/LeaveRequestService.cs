@@ -6,6 +6,7 @@ using SGE.Application.Services.Readers;
 using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 using SGE.Core.Enums;
+using SGE.Core.Exceptions;
 
 namespace SGE.Application.Services;
 
@@ -26,34 +27,57 @@ public class LeaveRequestService(
         return leaveRequest == null ? null : mapper.Map<LeaveRequestDto>(leaveRequest);
     }
 
-    public async Task<IEnumerable<LeaveRequestDto>> GetByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<LeaveRequestDto>> GetByEmployeeIdAsync(int employeeId,
+        CancellationToken cancellationToken = default)
     {
         var list = await leaveRequestRepository.GetByEmployeeIdAsync(employeeId, cancellationToken);
         return mapper.Map<IEnumerable<LeaveRequestDto>>(list);
     }
 
-    public async Task<IEnumerable<LeaveRequestDto>> GetByStatusAsync(int status, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<LeaveRequestDto>> GetByStatusAsync(int status,
+        CancellationToken cancellationToken = default)
     {
         var list = await leaveRequestRepository.GetByStatusAsync(status, cancellationToken);
         return mapper.Map<IEnumerable<LeaveRequestDto>>(list);
     }
 
-    public async Task<IEnumerable<LeaveRequestDto>> GetPendingRequestsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<LeaveRequestDto>> GetPendingRequestsAsync(
+        CancellationToken cancellationToken = default)
     {
         var list = await leaveRequestRepository.GetPendingRequestsAsync(cancellationToken);
         return mapper.Map<IEnumerable<LeaveRequestDto>>(list);
     }
 
-    public async Task<LeaveRequestDto> CreateAsync(LeaveRequestCreateDto dto, CancellationToken cancellationToken = default)
+    public async Task<LeaveRequestDto> CreateAsync(LeaveRequestCreateDto dto,
+        CancellationToken cancellationToken = default)
     {
+        // Validation du type de congé
+        if (!Enum.IsDefined(typeof(LeaveType), dto.LeaveType))
+            throw new InvalidLeaveRequestDataException($"Le type de congé '{dto.LeaveType}' n'est pas valide.");
+
         var employee = await employeeRepository.GetByIdAsync(dto.EmployeeId, cancellationToken);
         if (employee == null)
-            throw new ApplicationException("Employee not found");
+            throw new EmployeeNotFoundException(dto.EmployeeId);
+
+        // Normaliser les dates (ignorer l'heure)
+        var startDate = dto.StartDate.Date;
+        var endDate = dto.EndDate.Date;
+
+        // Validation des dates
+        if (startDate < DateTime.UtcNow.Date)
+            throw new InvalidLeaveRequestDataException($"La date de début ({startDate:yyyy-MM-dd}) ne peut pas être dans le passé.");
+
+        if (endDate < startDate)
+            throw new InvalidLeaveRequestDataException($"La date de fin ({endDate:yyyy-MM-dd}) doit être postérieure ou égale à la date de début ({startDate:yyyy-MM-dd}).");
 
         var entity = mapper.Map<LeaveRequest>(dto);
         
+        // Utiliser les dates normalisées
+        entity.StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+        entity.EndDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+
         // Calculate days requested
-        entity.DaysRequested = (dto.EndDate.Date - dto.StartDate.Date).Days + 1;
+        entity.DaysRequested = (endDate - startDate).Days + 1;
         entity.Status = LeaveStatus.Pending;
         entity.CreatedBy = "System";
         entity.UpdatedBy = "System";
@@ -62,10 +86,12 @@ public class LeaveRequestService(
         return mapper.Map<LeaveRequestDto>(entity);
     }
 
-    public async Task<bool> UpdateAsync(int id, LeaveRequestUpdateDto dto, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateAsync(int id, LeaveRequestUpdateDto dto,
+        CancellationToken cancellationToken = default)
     {
         var entity = await leaveRequestRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new LeaveRequestNotFoundException(id);
 
         if (dto.Status.HasValue)
             entity.Status = (LeaveStatus)dto.Status.Value;
@@ -80,13 +106,15 @@ public class LeaveRequestService(
         return true;
     }
 
-    public async Task<bool> ApproveAsync(int id, string approvedBy, string? comments = null, CancellationToken cancellationToken = default)
+    public async Task<bool> ApproveAsync(int id, string approvedBy, string? comments = null,
+        CancellationToken cancellationToken = default)
     {
         var entity = await leaveRequestRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new LeaveRequestNotFoundException(id);
 
         if (entity.Status != LeaveStatus.Pending)
-            throw new ApplicationException("Only pending leave requests can be approved");
+            throw new InvalidLeaveStatusTransitionException(entity.Status, LeaveStatus.Approved);
 
         entity.Status = LeaveStatus.Approved;
         entity.ReviewedBy = approvedBy;
@@ -99,13 +127,15 @@ public class LeaveRequestService(
         return true;
     }
 
-    public async Task<bool> RejectAsync(int id, string rejectedBy, string? comments = null, CancellationToken cancellationToken = default)
+    public async Task<bool> RejectAsync(int id, string rejectedBy, string? comments = null,
+        CancellationToken cancellationToken = default)
     {
         var entity = await leaveRequestRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new LeaveRequestNotFoundException(id);
 
         if (entity.Status != LeaveStatus.Pending)
-            throw new ApplicationException("Only pending leave requests can be rejected");
+            throw new InvalidLeaveStatusTransitionException(entity.Status, LeaveStatus.Rejected);
 
         entity.Status = LeaveStatus.Rejected;
         entity.ReviewedBy = rejectedBy;
@@ -121,7 +151,8 @@ public class LeaveRequestService(
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await leaveRequestRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new LeaveRequestNotFoundException(id);
 
         await leaveRequestRepository.DeleteAsync(id, cancellationToken);
         return true;
@@ -181,7 +212,7 @@ public class LeaveRequestService(
                 var created = await CreateAsync(dto);
                 createdDtos.Add(created);
             }
-            catch (ApplicationException ex)
+            catch (SgeException ex)
             {
                 errors.Add($"Ligne {rowNumber}: {ex.Message}");
             }
@@ -191,9 +222,16 @@ public class LeaveRequestService(
             }
         }
 
-        return errors.Any()
-            ? throw new ApplicationException($"Erreurs lors de l'import:\n{string.Join("\n", errors)}")
-            : createdDtos;
+        if (errors.Any())
+        {
+            var validationErrors = new Dictionary<string, List<string>>
+            {
+                { "Import", errors }
+            };
+            throw new ValidationException(validationErrors);
+        }
+
+        return createdDtos;
     }
 
     public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)

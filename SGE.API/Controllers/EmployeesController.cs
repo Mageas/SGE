@@ -104,9 +104,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, EmployeeUpdateDto dto, CancellationToken cancellationToken)
     {
-        var ok = await employeeService.UpdateAsync(id, dto, cancellationToken);
-        if (!ok) return NotFound();
-
+        await employeeService.UpdateAsync(id, dto, cancellationToken);
         return NoContent();
     }
 
@@ -122,9 +120,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var ok = await employeeService.DeleteAsync(id, cancellationToken);
-        if (!ok) return NotFound();
-
+        await employeeService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
 

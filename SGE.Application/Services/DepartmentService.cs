@@ -5,6 +5,7 @@ using SGE.Application.Interfaces.Services;
 using SGE.Application.Services.Readers;
 using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
+using SGE.Core.Exceptions;
 
 namespace SGE.Application.Services;
 
@@ -43,10 +44,12 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<DepartmentDto> CreateAsync(DepartmentCreateDto dto, CancellationToken cancellationToken = default)
     {
         var existingName = await departmentRepository.GetByNameAsync(dto.Name, cancellationToken);
-        if (existingName != null) throw new ApplicationException("Department name already exists");
+        if (existingName != null)
+            throw new DuplicateDepartmentNameException(dto.Name);
 
         var existingCode = await departmentRepository.GetByCodeAsync(dto.Code, cancellationToken);
-        if (existingCode != null) throw new ApplicationException("Department code already exists");
+        if (existingCode != null)
+            throw new DuplicateDepartmentNameException(dto.Code);
 
         var entity = mapper.Map<Department>(dto);
         await departmentRepository.AddAsync(entity, cancellationToken);
@@ -63,7 +66,8 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<bool> UpdateAsync(int id, DepartmentUpdateDto dto, CancellationToken cancellationToken = default)
     {
         var entity = await departmentRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new DepartmentNotFoundException(id);
 
         mapper.Map(dto, entity);
         await departmentRepository.UpdateAsync(entity, cancellationToken);
@@ -79,7 +83,8 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await departmentRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new DepartmentNotFoundException(id);
 
         await departmentRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
@@ -95,15 +100,44 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
         var excelReader = new ExcelReader();
         var rows = excelReader.Read(fileUploadModel.File);
 
-        var dtosList = rows.Select(row => new DepartmentCreateDto
-        {
-            Name = row["name"],
-            Code = row["code"],
-            Description = row["description"]
-        });
-
         var createdDtos = new List<DepartmentDto>();
-        foreach (var dto in dtosList) createdDtos.Add(await CreateAsync(dto));
+        var errors = new List<string>();
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var row = rows[i];
+            var rowNumber = i + 2;
+
+            try
+            {
+                var dto = new DepartmentCreateDto
+                {
+                    Name = row["name"],
+                    Code = row["code"],
+                    Description = row["description"]
+                };
+
+                var created = await CreateAsync(dto);
+                createdDtos.Add(created);
+            }
+            catch (SgeException ex)
+            {
+                errors.Add($"Ligne {rowNumber}: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"Ligne {rowNumber}: Erreur inattendue - {ex.Message}");
+            }
+        }
+
+        if (errors.Any())
+        {
+            var validationErrors = new Dictionary<string, List<string>>
+            {
+                { "Import", errors }
+            };
+            throw new ValidationException(validationErrors);
+        }
 
         return createdDtos;
     }
