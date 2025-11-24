@@ -13,21 +13,21 @@
     networks:
       - sge_network
 
-  sge.api:
-    image: sge.api
-    build:
-      context: .
-      dockerfile: SGE.API/Dockerfile
-    container_name: sge_api
-    ports:
-      - "8000:8080"
-    depends_on:
-      - sge.postgres
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=sgedb;Username=sgeuser;Password=sgepassword
-    networks:
-      - sge_network
+  # sge.api:
+  #   image: sge.api
+  #   build:
+  #     context: .
+  #     dockerfile: SGE.API/Dockerfile
+  #   container_name: sge_api
+  #   ports:
+  #     - "8000:8080"
+  #   depends_on:
+  #     - sge.postgres
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ConnectionStrings__DefaultConnection=Host=postgres;Database=sgedb;Username=sgeuser;Password=sgepassword
+  #   networks:
+  #     - sge_network
 
 volumes:
   postgres_data:
