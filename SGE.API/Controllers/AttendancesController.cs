@@ -67,16 +67,14 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, AttendanceUpdateDto dto, CancellationToken cancellationToken)
     {
-        var ok = await attendanceService.UpdateAsync(id, dto, cancellationToken);
-        if (!ok) return NotFound();
+        await attendanceService.UpdateAsync(id, dto, cancellationToken);
         return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var ok = await attendanceService.DeleteAsync(id, cancellationToken);
-        if (!ok) return NotFound();
+        await attendanceService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
 

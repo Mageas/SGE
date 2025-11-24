@@ -5,6 +5,7 @@ using SGE.Application.Interfaces.Services;
 using SGE.Application.Services.Readers;
 using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
+using SGE.Core.Exceptions;
 
 namespace SGE.Application.Services;
 
@@ -87,10 +88,12 @@ public class EmployeeService(
         CancellationToken cancellationToken = default)
     {
         var department = await departmentRepository.GetByIdAsync(dto.DepartmentId, cancellationToken);
-        if (department == null) throw new ApplicationException("Il n'existe aucun departement avec cet identifiant");
+        if (department == null)
+            throw new DepartmentNotFoundException(dto.DepartmentId);
 
         var existingEmployee = await employeeRepository.GetByEmailAsync(dto.Email, cancellationToken);
-        if (existingEmployee != null) throw new ApplicationException("Cet email existe déjà pour un autre employée");
+        if (existingEmployee != null)
+            throw new InvalidEmployeeDataException($"L'adresse email '{dto.Email}' est déjà utilisée par un autre employé.");
 
         var entity = mapper.Map<Employee>(dto);
 
@@ -113,7 +116,8 @@ public class EmployeeService(
     public async Task<bool> UpdateAsync(int id, EmployeeUpdateDto dto, CancellationToken cancellationToken = default)
     {
         var entity = await employeeRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new EmployeeNotFoundException(id);
 
         mapper.Map(dto, entity);
         await employeeRepository.UpdateAsync(entity, cancellationToken);
@@ -132,7 +136,8 @@ public class EmployeeService(
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await employeeRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new EmployeeNotFoundException(id);
 
         await employeeRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
@@ -201,7 +206,7 @@ public class EmployeeService(
                 var created = await CreateAsync(dto);
                 createdDtos.Add(created);
             }
-            catch (ApplicationException ex)
+            catch (SgeException ex)
             {
                 errors.Add($"Ligne {rowNumber}: {ex.Message}");
             }
@@ -211,9 +216,16 @@ public class EmployeeService(
             }
         }
 
-        return errors.Any()
-            ? throw new ApplicationException($"Erreurs lors de l'import:\n{string.Join("\n", errors)}")
-            : createdDtos;
+        if (errors.Any())
+        {
+            var validationErrors = new Dictionary<string, List<string>>
+            {
+                { "Import", errors }
+            };
+            throw new ValidationException(validationErrors);
+        }
+
+        return createdDtos;
     }
 
     /// <summary>
@@ -257,7 +269,8 @@ public class EmployeeService(
             num = rand.Next(0, chars.Length);
             uniqueId = FormatUniqueId();
 
-            if (retry >= 10) throw new ApplicationException("Impossible de générer un identifiant unique");
+            if (retry >= 10)
+                throw new InvalidEmployeeDataException("Impossible de générer un identifiant unique pour cet employé.");
 
             retry++;
         }

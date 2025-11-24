@@ -72,9 +72,7 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, DepartmentUpdateDto dto, CancellationToken cancellationToken)
     {
-        var ok = await departmentService.UpdateAsync(id, dto, cancellationToken);
-        if (!ok) return NotFound();
-
+        await departmentService.UpdateAsync(id, dto, cancellationToken);
         return NoContent();
     }
 
@@ -90,9 +88,7 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var ok = await departmentService.DeleteAsync(id, cancellationToken);
-        if (!ok) return NotFound();
-
+        await departmentService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
 

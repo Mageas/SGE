@@ -5,6 +5,7 @@ using SGE.Application.Interfaces.Services;
 using SGE.Application.Services.Readers;
 using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
+using SGE.Core.Exceptions;
 
 namespace SGE.Application.Services;
 
@@ -47,11 +48,18 @@ public class AttendanceService(
     {
         var employee = await employeeRepository.GetByIdAsync(dto.EmployeeId, cancellationToken);
         if (employee == null)
-            throw new ApplicationException("Employee not found");
+            throw new EmployeeNotFoundException(dto.EmployeeId);
 
         var existing = await attendanceRepository.GetByEmployeeAndDateAsync(dto.EmployeeId, dto.Date, cancellationToken);
         if (existing != null)
-            throw new ApplicationException("Attendance record already exists for this employee on this date");
+            throw new DuplicateAttendanceException(dto.EmployeeId, dto.Date);
+
+        // Validation des données
+        if (dto.ClockIn.HasValue && dto.ClockOut.HasValue && dto.ClockOut <= dto.ClockIn)
+            throw new InvalidAttendanceDataException("L'heure de sortie doit être postérieure à l'heure d'entrée.");
+
+        if (dto.BreakDuration.HasValue && dto.BreakDuration.Value.TotalHours < 0)
+            throw new InvalidAttendanceDataException("La durée de pause ne peut pas être négative.");
 
         var entity = mapper.Map<Attendance>(dto);
         
@@ -80,9 +88,17 @@ public class AttendanceService(
     public async Task<bool> UpdateAsync(int id, AttendanceUpdateDto dto, CancellationToken cancellationToken = default)
     {
         var entity = await attendanceRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new AttendanceNotFoundException(id);
 
         mapper.Map(dto, entity);
+        
+        // Validation des données
+        if (entity.ClockIn.HasValue && entity.ClockOut.HasValue && entity.ClockOut <= entity.ClockIn)
+            throw new InvalidAttendanceDataException("L'heure de sortie doit être postérieure à l'heure d'entrée.");
+
+        if (entity.BreakDuration.HasValue && entity.BreakDuration.Value.TotalHours < 0)
+            throw new InvalidAttendanceDataException("La durée de pause ne peut pas être négative.");
         
         // Recalculate worked hours if times are updated
         if (entity.ClockIn.HasValue && entity.ClockOut.HasValue)
@@ -109,7 +125,8 @@ public class AttendanceService(
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var entity = await attendanceRepository.GetByIdAsync(id, cancellationToken);
-        if (entity == null) return false;
+        if (entity == null)
+            throw new AttendanceNotFoundException(id);
 
         await attendanceRepository.DeleteAsync(id, cancellationToken);
         return true;
@@ -169,7 +186,7 @@ public class AttendanceService(
                 var created = await CreateAsync(dto);
                 createdDtos.Add(created);
             }
-            catch (ApplicationException ex)
+            catch (SgeException ex)
             {
                 errors.Add($"Ligne {rowNumber}: {ex.Message}");
             }
@@ -179,9 +196,16 @@ public class AttendanceService(
             }
         }
 
-        return errors.Any()
-            ? throw new ApplicationException($"Erreurs lors de l'import:\n{string.Join("\n", errors)}")
-            : createdDtos;
+        if (errors.Any())
+        {
+            var validationErrors = new Dictionary<string, List<string>>
+            {
+                { "Import", errors }
+            };
+            throw new ValidationException(validationErrors);
+        }
+
+        return createdDtos;
     }
 
     public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)

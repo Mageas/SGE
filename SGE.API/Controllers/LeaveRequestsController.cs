@@ -58,32 +58,28 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, LeaveRequestUpdateDto dto, CancellationToken cancellationToken)
     {
-        var ok = await leaveRequestService.UpdateAsync(id, dto, cancellationToken);
-        if (!ok) return NotFound();
+        await leaveRequestService.UpdateAsync(id, dto, cancellationToken);
         return NoContent();
     }
 
     [HttpPost("{id:int}/approve")]
     public async Task<IActionResult> Approve(int id, [FromBody] ApprovalDto dto, CancellationToken cancellationToken)
     {
-        var ok = await leaveRequestService.ApproveAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
-        if (!ok) return NotFound();
+        await leaveRequestService.ApproveAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
         return NoContent();
     }
 
     [HttpPost("{id:int}/reject")]
     public async Task<IActionResult> Reject(int id, [FromBody] ApprovalDto dto, CancellationToken cancellationToken)
     {
-        var ok = await leaveRequestService.RejectAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
-        if (!ok) return NotFound();
+        await leaveRequestService.RejectAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
         return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var ok = await leaveRequestService.DeleteAsync(id, cancellationToken);
-        if (!ok) return NotFound();
+        await leaveRequestService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
 
