@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.Attendances;
 using SGE.Application.Interfaces.Services;
@@ -10,6 +11,7 @@ namespace SGE.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AttendancesController(IAttendanceService attendanceService) : ControllerBase
 {
     [HttpGet]
@@ -58,6 +60,7 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult<AttendanceDto>> Create(AttendanceCreateDto dto, CancellationToken cancellationToken)
     {
         var created = await attendanceService.CreateAsync(dto, cancellationToken);
@@ -65,6 +68,7 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Update(int id, AttendanceUpdateDto dto, CancellationToken cancellationToken)
     {
         await attendanceService.UpdateAsync(id, dto, cancellationToken);
@@ -72,6 +76,7 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await attendanceService.DeleteAsync(id, cancellationToken);
@@ -79,6 +84,7 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     }
 
     [HttpPost("import")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
     {
         if (fileUploadModel == null) return BadRequest("No file uploaded");

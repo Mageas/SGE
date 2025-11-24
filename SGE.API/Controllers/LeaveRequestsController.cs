@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.LeaveRequests;
 using SGE.Application.Interfaces.Services;
@@ -10,6 +11,7 @@ namespace SGE.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class LeaveRequestsController(ILeaveRequestService leaveRequestService) : ControllerBase
 {
     [HttpGet]
@@ -63,6 +65,7 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpPost("{id:int}/approve")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Approve(int id, [FromBody] ApprovalDto dto, CancellationToken cancellationToken)
     {
         await leaveRequestService.ApproveAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
@@ -70,6 +73,7 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpPost("{id:int}/reject")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Reject(int id, [FromBody] ApprovalDto dto, CancellationToken cancellationToken)
     {
         await leaveRequestService.RejectAsync(id, dto.ApprovedBy, dto.Comments, cancellationToken);
@@ -77,6 +81,7 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await leaveRequestService.DeleteAsync(id, cancellationToken);
@@ -84,6 +89,7 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpPost("import")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
     {
         if (fileUploadModel == null) return BadRequest("No file uploaded");

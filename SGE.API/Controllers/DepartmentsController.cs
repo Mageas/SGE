@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.Departments;
 using SGE.Application.Interfaces.Services;
@@ -11,6 +12,7 @@ namespace SGE.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class DepartmentsController(IDepartmentService departmentService) : ControllerBase
 {
     /// <summary>
@@ -53,6 +55,7 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     ///     and other details.
     /// </returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult<DepartmentDto>> Create(DepartmentCreateDto dto, CancellationToken cancellationToken)
     {
         var created = await departmentService.CreateAsync(dto, cancellationToken);
@@ -70,6 +73,7 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     ///     <see cref="NoContentResult" /> if successful, or <see cref="NotFoundResult" /> if the department is not found.
     /// </returns>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Update(int id, DepartmentUpdateDto dto, CancellationToken cancellationToken)
     {
         await departmentService.UpdateAsync(id, dto, cancellationToken);
@@ -86,6 +90,7 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     ///     otherwise NotFound if the department does not exist.
     /// </returns>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await departmentService.DeleteAsync(id, cancellationToken);
