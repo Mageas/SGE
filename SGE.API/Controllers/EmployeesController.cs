@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.Employees;
 using SGE.Application.Interfaces.Services;
@@ -7,6 +8,7 @@ namespace SGE.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EmployeesController(IEmployeeService employeeService) :
     ControllerBase
 {
@@ -85,6 +87,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     ///     An asynchronous task that returns an action result containing the created EmployeeDto object.
     /// </returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult<EmployeeDto>> Create(EmployeeCreateDto dto, CancellationToken cancellationToken)
     {
         var created = await employeeService.CreateAsync(dto, cancellationToken);
@@ -102,6 +105,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     ///     successful or <c>NotFound</c> if the employee is not found.
     /// </returns>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Update(int id, EmployeeUpdateDto dto, CancellationToken cancellationToken)
     {
         await employeeService.UpdateAsync(id, dto, cancellationToken);
@@ -118,6 +122,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     ///     if the employee does not exist.
     /// </returns>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await employeeService.DeleteAsync(id, cancellationToken);
@@ -130,6 +135,7 @@ public class EmployeesController(IEmployeeService employeeService) :
     /// <param name="fileUploadModel"></param>
     /// <returns></returns>
     [HttpPost("import")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
     {
         if (fileUploadModel == null) return BadRequest("No file uploaded");

@@ -7,3 +7,8 @@ Appliquer la migration
 ```sh
 dotnet ef database update --project SGE.Infrastructure --startup-project SGE.API
 ```
+
+Supprimer la BDD
+```sh
+dotnet ef database drop --project SGE.Infrastructure --startup-project SGE.API
+```
