@@ -45,47 +45,60 @@ public class GlobalExceptionHandlingMiddleware
                     validationException.Errors,
                     traceId),
 
-                SgeException sgeException => ErrorResponse.Create(
-                    sgeException.Message,
-                    sgeException.ErrorCode,
-                    sgeException.StatusCode,
+                // 404 Not Found Exceptions
+                AttendanceNotFoundException ex =>
+                    ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                DepartmentNotFoundException ex =>
+                    ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                EmployeeNotFoundException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                LeaveRequestNotFoundException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
                     traceId),
 
-                ArgumentNullException => ErrorResponse.Create(
-                    "Un paramètre requis est manquant.",
-                    "ARGUMENT_NULL",
-                    400,
+                // 409 Conflict Exceptions
+                AlreadyClockedInException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                ConflictingLeaveRequestException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                DuplicateAttendanceException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                DuplicateDepartmentNameException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
                     traceId),
 
-                ArgumentException => ErrorResponse.Create(
-                    "Un paramètre fourni est invalide.",
-                    "INVALID_ARGUMENT",
-                    400,
+                // 400 Bad Request Exceptions
+                BusinessRuleException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                InsufficientLeaveDaysException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                InvalidAttendanceDataException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                InvalidDateRangeException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                InvalidEmployeeDataException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                InvalidLeaveRequestDataException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode,
+                    traceId),
+                InvalidLeaveStatusTransitionException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode,
+                    ex.StatusCode, traceId),
+                NotClockedInException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+                AttendanceException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+
+                // Generic SGE Exception
+                SgeException sgeException => ErrorResponse.Create(sgeException.Message, sgeException.ErrorCode,
+                    sgeException.StatusCode, traceId),
+
+                ArgumentNullException => ErrorResponse.Create("Un paramètre requis est manquant.", "ARGUMENT_NULL", 400,
                     traceId),
 
-                UnauthorizedAccessException => ErrorResponse.Create(
-                    "Accès non autorisé.",
-                    "UNAUTHORIZED",
-                    401,
+                ArgumentException => ErrorResponse.Create("Un paramètre fourni est invalide.", "INVALID_ARGUMENT", 400,
                     traceId),
 
-                NotImplementedException => ErrorResponse.Create(
-                    "Fonctionnalité non implémentée.",
-                    "NOT_IMPLEMENTED",
-                    501,
-                    traceId),
+                UnauthorizedAccessException =>
+                    ErrorResponse.Create("Accès non autorisé.", "UNAUTHORIZED", 401, traceId),
 
-                TimeoutException => ErrorResponse.Create(
-                    "L'opération a expiré.",
-                    "TIMEOUT",
-                    408,
-                    traceId),
+                NotImplementedException => ErrorResponse.Create("Fonctionnalité non implémentée.", "NOT_IMPLEMENTED",
+                    501, traceId),
+
+                TimeoutException => ErrorResponse.Create("L'opération a expiré.", "TIMEOUT", 408, traceId),
 
                 // Gestion par défaut pour toutes les autres erreurs non gérées (500)
-                _ => ErrorResponse.Create(
-                    "Une erreur interne du serveur est survenue.",
-                    "INTERNAL_SERVER_ERROR",
-                    500,
+                _ => ErrorResponse.Create("Une erreur interne du serveur est survenue.", "INTERNAL_SERVER_ERROR", 500,
                     traceId)
             };
 
