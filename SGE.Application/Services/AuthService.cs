@@ -20,6 +20,7 @@ namespace SGE.Application.Services;
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
+    private readonly IEmployeeRepository _employeeRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly UserManager<ApplicationUser> _userManager;
 
@@ -29,14 +30,17 @@ public class AuthService : IAuthService
     /// <param name="userManager">The user manager for handling user operations.</param>
     /// <param name="configuration">The configuration for accessing JWT settings.</param>
     /// <param name="refreshTokenRepository">The repository for managing refresh tokens.</param>
+    /// <param name="employeeRepository">The repository for accessing employee data.</param>
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IRefreshTokenRepository refreshTokenRepository)
+        IRefreshTokenRepository refreshTokenRepository,
+        IEmployeeRepository employeeRepository)
     {
         _userManager = userManager;
         _configuration = configuration;
         _refreshTokenRepository = refreshTokenRepository;
+        _employeeRepository = employeeRepository;
     }
 
     /// <inheritdoc />
@@ -50,6 +54,20 @@ public class AuthService : IAuthService
         // Vérifier la correspondance des mots de passe
         if (registerDto.Password != registerDto.ConfirmPassword)
             throw new UserRegistrationException("Les mots de passe ne correspondent pas.");
+
+        if (!registerDto.EmployeeId.HasValue)
+            throw new UserRegistrationException("Le champ EmployeeId est obligatoire.");
+
+        // 1. Vérifier que l'employé existe
+        var employee = await _employeeRepository.GetByIdAsync(registerDto.EmployeeId.Value);
+        if (employee == null)
+            throw new UserRegistrationException($"L'employé avec l'ID {registerDto.EmployeeId} n'existe pas.");
+
+        // 2. Vérifier que l'employé n'est pas déjà lié à un utilisateur
+        var isEmployeeLinked = _userManager.Users.Any(u => u.EmployeeId == registerDto.EmployeeId.Value);
+        if (isEmployeeLinked)
+            throw new UserRegistrationException(
+                $"L'employé avec l'ID {registerDto.EmployeeId} est déjà lié à un compte utilisateur.");
 
         // Créer le nouvel utilisateur
         var user = new ApplicationUser
@@ -222,7 +240,9 @@ public class AuthService : IAuthService
     private async Task<string> GenerateAccessToken(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new ConfigurationException("JWT Secret not configured"));
+        var secretKey =
+            Encoding.ASCII.GetBytes(jwtSettings["Secret"] ??
+                                    throw new ConfigurationException("JWT Secret not configured"));
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -273,7 +293,9 @@ public class AuthService : IAuthService
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new ConfigurationException("JWT Secret not configured"));
+        var secretKey =
+            Encoding.ASCII.GetBytes(jwtSettings["Secret"] ??
+                                    throw new ConfigurationException("JWT Secret not configured"));
 
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -304,7 +326,7 @@ public class AuthService : IAuthService
     /// <returns>The number of minutes until the access token expires.</returns>
     private int GetAccessTokenExpirationMinutes()
     {
-        return _configuration.GetValue<int>("JwtSettings:AccessTokenExpiration", 60);
+        return _configuration.GetValue("JwtSettings:AccessTokenExpiration", 60);
     }
 
     /// <summary>
@@ -313,6 +335,6 @@ public class AuthService : IAuthService
     /// <returns>The number of days until the refresh token expires.</returns>
     private int GetRefreshTokenExpirationDays()
     {
-        return _configuration.GetValue<int>("JwtSettings:RefreshTokenExpiration", 7);
+        return _configuration.GetValue("JwtSettings:RefreshTokenExpiration", 7);
     }
 }
