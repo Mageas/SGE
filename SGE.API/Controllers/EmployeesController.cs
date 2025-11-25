@@ -132,17 +132,16 @@ public class EmployeesController(IEmployeeService employeeService) :
     /// <summary>
     ///     Import from a file
     /// </summary>
-    /// <param name="fileUploadModel"></param>
-    /// <returns></returns>
     [HttpPost("import")]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
+    public async Task<ActionResult> ImportFile(IFormFile file)
     {
-        if (fileUploadModel == null) return BadRequest("No file uploaded");
+        if (file.Length == 0) return BadRequest("No file uploaded");
 
-        if (fileUploadModel.File.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        if (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             return BadRequest("File is not a valid Excel file");
 
+        var fileUploadModel = new FileUploadModel { File = file };
         var createdDtos = await employeeService.ImportFile(fileUploadModel);
 
         return Ok(createdDtos);

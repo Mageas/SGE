@@ -45,6 +45,10 @@ public class GlobalExceptionHandlingMiddleware
                     validationException.Errors,
                     traceId),
 
+                ImportException importException => ErrorResponse.CreateValidation(
+                    importException.Errors,
+                    traceId),
+
                 // 404 Not Found Exceptions
                 AttendanceNotFoundException ex =>
                     ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),

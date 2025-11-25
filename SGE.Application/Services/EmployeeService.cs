@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using SGE.Application.DTOs.Employees;
 using SGE.Application.Interfaces.Repositories;
@@ -93,7 +94,8 @@ public class EmployeeService(
 
         var existingEmployee = await employeeRepository.GetByEmailAsync(dto.Email, cancellationToken);
         if (existingEmployee != null)
-            throw new InvalidEmployeeDataException($"L'adresse email '{dto.Email}' est déjà utilisée par un autre employé.");
+            throw new InvalidEmployeeDataException(
+                $"L'adresse email '{dto.Email}' est déjà utilisée par un autre employé.");
 
         var entity = mapper.Map<Employee>(dto);
 
@@ -153,54 +155,79 @@ public class EmployeeService(
         var excelReader = new ExcelReader();
         var rows = excelReader.Read(fileUploadModel.File);
 
+        if (rows.Count == 0)
+            return new List<EmployeeDto>();
+
+        // Validation des colonnes requises
+        var requiredColumns = new[]
+        {
+            "firstname", "lastname", "email", "departmentid", "hiredate", "salary", "gender"
+        };
+
+        var missingColumns = requiredColumns.Where(c => !rows[0].ContainsKey(c)).ToList();
+
+        if (missingColumns.Any())
+        {
+            var errors = new Dictionary<string, List<string>>
+            {
+                { "General", new List<string> { $"Colonnes manquantes : {string.Join(", ", missingColumns)}" } }
+            };
+            throw new ImportException(errors);
+        }
+
         var createdDtos = new List<EmployeeDto>();
-        var errors = new List<string>();
+        var errorsByLine = new Dictionary<string, List<string>>();
 
         for (var i = 0; i < rows.Count; i++)
         {
             var row = rows[i];
             var rowNumber = i + 2;
+            var lineErrors = new List<string>();
+
+            // Validation des champs obligatoires et types
+            if (string.IsNullOrWhiteSpace(row["firstname"]))
+                lineErrors.Add("Le prénom est requis.");
+
+            if (string.IsNullOrWhiteSpace(row["lastname"]))
+                lineErrors.Add("Le nom est requis.");
+
+            if (string.IsNullOrWhiteSpace(row["email"]))
+                lineErrors.Add("L'email est requis.");
+
+            if (!int.TryParse(row["gender"], out var gender))
+                lineErrors.Add($"Genre invalide : '{row["gender"]}'.");
+
+            if (!decimal.TryParse(row["salary"], out var salary))
+                lineErrors.Add($"Salaire invalide : '{row["salary"]}'.");
+
+            if (!int.TryParse(row["departmentid"], out var departmentId))
+                lineErrors.Add($"ID Département invalide : '{row["departmentid"]}'.");
+
+            var hireDate = ParseDate(row["hiredate"]);
+            if (!hireDate.HasValue)
+                lineErrors.Add(
+                    $"Date d'embauche invalide : '{row["hiredate"]}'. Formats acceptés : dd/MM/yyyy, yyyy-MM-dd.");
+
+            if (lineErrors.Any())
+            {
+                errorsByLine.Add($"Ligne {rowNumber}", lineErrors);
+                continue;
+            }
 
             try
             {
-                if (!int.TryParse(row["gender"], out var gender))
-                {
-                    errors.Add($"Ligne {rowNumber}: Gender invalide '{row["gender"]}'");
-                    continue;
-                }
-
-                if (!decimal.TryParse(row["salary"], out var salary))
-                {
-                    errors.Add($"Ligne {rowNumber}: Salary invalide '{row["salary"]}'");
-                    continue;
-                }
-
-                if (!int.TryParse(row["departmentid"], out var departmentId))
-                {
-                    errors.Add($"Ligne {rowNumber}: DepartmentId invalide '{row["departmentid"]}'");
-                    continue;
-                }
-
-                if (!DateTime.TryParse(row["hiredate"], out var hireDate))
-                {
-                    errors.Add($"Ligne {rowNumber}: HireDate invalide '{row["hiredate"]}'");
-                    continue;
-                }
-
-                hireDate = DateTime.SpecifyKind(hireDate, DateTimeKind.Utc);
-
                 var dto = new EmployeeCreateDto
                 {
                     FirstName = row["firstname"],
                     LastName = row["lastname"],
                     Gender = gender,
                     Email = row["email"],
-                    PhoneNumber = row["phonenumber"],
-                    Address = row["address"],
-                    Position = row["position"],
+                    PhoneNumber = row.ContainsKey("phonenumber") ? row["phonenumber"] : null,
+                    Address = row.ContainsKey("address") ? row["address"] : null,
+                    Position = row.ContainsKey("position") ? row["position"] : null,
                     Salary = salary,
                     DepartmentId = departmentId,
-                    HireDate = hireDate
+                    HireDate = hireDate!.Value
                 };
 
                 var created = await CreateAsync(dto);
@@ -208,22 +235,15 @@ public class EmployeeService(
             }
             catch (SgeException ex)
             {
-                errors.Add($"Ligne {rowNumber}: {ex.Message}");
+                errorsByLine.Add($"Ligne {rowNumber}", new List<string> { ex.Message });
             }
             catch (Exception ex)
             {
-                errors.Add($"Ligne {rowNumber}: Erreur inattendue - {ex.Message}");
+                errorsByLine.Add($"Ligne {rowNumber}", new List<string> { $"Erreur inattendue : {ex.Message}" });
             }
         }
 
-        if (errors.Any())
-        {
-            var validationErrors = new Dictionary<string, List<string>>
-            {
-                { "Import", errors }
-            };
-            throw new ValidationException(validationErrors);
-        }
+        if (errorsByLine.Any()) throw new ImportException(errorsByLine);
 
         return createdDtos;
     }
@@ -238,6 +258,30 @@ public class EmployeeService(
         var excelWriter = new ExcelWriter();
         var departments = await GetAllAsync(cancellationToken);
         return excelWriter.Write(departments.ToList(), "Employees");
+    }
+
+    private DateTime? ParseDate(string dateStr)
+    {
+        if (string.IsNullOrWhiteSpace(dateStr)) return null;
+
+        string[] formats =
+        {
+            // --- Formats date seule ---
+            "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy",
+
+            // --- Formats avec Heure:Minute (ex: 14:30) ---
+            "dd/MM/yyyy HH:mm", "yyyy-MM-dd HH:mm", "MM/dd/yyyy HH:mm", "dd-MM-yyyy HH:mm",
+            "yyyy-MM-ddTHH:mm", // Support ISO avec 'T'
+
+            // --- Formats avec Heure:Minute:Seconde (ex: 14:30:59) ---
+            "dd/MM/yyyy HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm:ss",
+            "yyyy-MM-ddTHH:mm:ss" // Support ISO avec 'T'
+        };
+
+        if (DateTime.TryParseExact(dateStr, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            return DateTime.SpecifyKind(date, DateTimeKind.Utc);
+
+        return null;
     }
 
     /// <summary>
