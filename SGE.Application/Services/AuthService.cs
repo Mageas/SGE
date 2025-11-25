@@ -222,7 +222,7 @@ public class AuthService : IAuthService
     private async Task<string> GenerateAccessToken(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"));
+        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new ConfigurationException("JWT Secret not configured"));
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -273,7 +273,7 @@ public class AuthService : IAuthService
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"));
+        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? throw new ConfigurationException("JWT Secret not configured"));
 
         var tokenValidationParameters = new TokenValidationParameters
         {

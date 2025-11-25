@@ -1,3 +1,5 @@
+using SGE.Core.Exceptions;
+
 namespace SGE.Application.DTOs.Departments;
 
 public class DepartmentUpdateDto
@@ -12,7 +14,7 @@ public class DepartmentUpdateDto
         get => _name;
         init
         {
-            if (value.Length <= 2) throw new ArgumentException("Name must be at least 2 characters long.");
+            if (value.Length <= 2) throw new ValidationException(nameof(Name), "Name must be at least 2 characters long.");
 
             _name = value;
         }
