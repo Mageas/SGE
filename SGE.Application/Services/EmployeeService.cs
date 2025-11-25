@@ -121,6 +121,13 @@ public class EmployeeService(
         if (entity == null)
             throw new EmployeeNotFoundException(id);
 
+        if (entity.DepartmentId != dto.DepartmentId)
+        {
+            var department = await departmentRepository.GetByIdAsync(dto.DepartmentId, cancellationToken);
+            if (department == null)
+                throw new DepartmentNotFoundException(dto.DepartmentId);
+        }
+
         mapper.Map(dto, entity);
         await employeeRepository.UpdateAsync(entity, cancellationToken);
         return true;
