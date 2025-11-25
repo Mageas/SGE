@@ -36,6 +36,14 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
         return Ok(leaveRequests);
     }
 
+    [HttpGet("employee/email/{email}")]
+    public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByEmployeeEmail(string email,
+        CancellationToken cancellationToken)
+    {
+        var leaveRequests = await leaveRequestService.GetByEmployeeEmailAsync(email, cancellationToken);
+        return Ok(leaveRequests);
+    }
+
     [HttpGet("status/{status:int}")]
     public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByStatus(int status,
         CancellationToken cancellationToken)

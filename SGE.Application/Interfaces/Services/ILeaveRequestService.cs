@@ -13,6 +13,9 @@ public interface ILeaveRequestService
     Task<IEnumerable<LeaveRequestDto>> GetByEmployeeIdAsync(int employeeId,
         CancellationToken cancellationToken = default);
 
+    Task<IEnumerable<LeaveRequestDto>> GetByEmployeeEmailAsync(string email,
+        CancellationToken cancellationToken = default);
+
     Task<IEnumerable<LeaveRequestDto>> GetByStatusAsync(int status, CancellationToken cancellationToken = default);
     Task<IEnumerable<LeaveRequestDto>> GetPendingRequestsAsync(CancellationToken cancellationToken = default);
     Task<LeaveRequestDto> CreateAsync(LeaveRequestCreateDto dto, CancellationToken cancellationToken = default);

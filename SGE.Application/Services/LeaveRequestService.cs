@@ -32,6 +32,17 @@ public class LeaveRequestService(
         return mapper.Map<IEnumerable<LeaveRequestDto>>(list);
     }
 
+    public async Task<IEnumerable<LeaveRequestDto>> GetByEmployeeEmailAsync(string email,
+        CancellationToken cancellationToken = default)
+    {
+        var employee = await employeeRepository.GetByEmailAsync(email, cancellationToken);
+        if (employee == null)
+            throw new EmployeeEmailNotFoundException(email);
+
+        var list = await leaveRequestRepository.GetByEmployeeIdAsync(employee.Id, cancellationToken);
+        return mapper.Map<IEnumerable<LeaveRequestDto>>(list);
+    }
+
     public async Task<IEnumerable<LeaveRequestDto>> GetByStatusAsync(int status,
         CancellationToken cancellationToken = default)
     {
