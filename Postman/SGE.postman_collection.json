@@ -1,0 +1,1519 @@
+{
+	"info": {
+		"_postman_id": "d2e7ac6c-2412-4170-949e-3599c67b0a79",
+		"name": "SGE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31553491"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"if (response.accessToken && response.refreshToken) {",
+									"    pm.environment.set('accessToken', response.accessToken);",
+									"    pm.environment.set('refreshToken', response.refreshToken);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomFirstName = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const randomLastName = pm.variables.replaceIn('{{$randomLastName}}');",
+									"const email = pm.variables.replaceIn('{{$randomEmail}}');",
+									"const password = pm.variables.replaceIn('{{$randomPassword}}');",
+									"const userName = pm.variables.replaceIn('{{$randomUserName}}');",
+									"",
+									"pm.collectionVariables.set('randomFirstName', randomFirstName);",
+									"pm.collectionVariables.set('randomLastName', randomLastName);",
+									"pm.collectionVariables.set('signup_email', email);",
+									"pm.collectionVariables.set('signup_password', password);",
+									"pm.collectionVariables.set('userName', userName);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"{{randomFirstName}}\",\n  \"lastName\": \"{{randomLastName}}\",\n  \"email\": \"{{signup_email}}\",\n  \"userName\": \"{{userName}}\",\n  \"password\": \"{{signup_password}}\",\n  \"confirmPassword\": \"{{signup_password}}\",\n  \"employeeId\": {{employeeId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"if (response.accessToken && response.refreshToken) {",
+									"    pm.environment.set('accessToken', response.accessToken);",
+									"    pm.environment.set('refreshToken', response.refreshToken);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{signup_email}}\",\n    \"password\": \"{{signup_password}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.environment.set('accessToken', response.accessToken);",
+									"pm.environment.set('refreshToken', response.refreshToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@sge.com\",\n    \"password\": \"Admin123!\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.environment.set('accessToken', response.accessToken);",
+									"pm.environment.set('refreshToken', response.refreshToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"manager@sge.com\",\n    \"password\": \"Manager123!\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"if (response.accessToken && response.refreshToken) {",
+									"    pm.environment.set('accessToken', response.accessToken);",
+									"    pm.environment.set('refreshToken', response.refreshToken);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessToken\": \"{{accessToken}}\",\n    \"refreshToken\": \"{{refreshToken}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/refresh-token",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"{{refreshToken}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/revoke-token",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"revoke-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/auth/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Departments",
+			"item": [
+				{
+					"name": "Get All Departments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/departments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Department",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/departments/{{departmentId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"departments",
+								"{{departmentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Department",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomJobArea = pm.variables.replaceIn('{{$randomJobArea}}').slice(0, 10);",
+									"const randomJobAreaUpper = randomJobArea.toUpperCase();",
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomJobArea', randomJobArea);",
+									"pm.collectionVariables.set('randomJobAreaUpper', randomJobAreaUpper);",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set('departmentId', response.id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{randomJobArea}}\",\n    \"code\": \"{{randomJobAreaUpper}}\",\n    \"description\": \"{{randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/departments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/departments/{{departmentId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"departments",
+								"{{departmentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Department",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/departments/{{departmentId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"departments",
+								"{{departmentId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employees",
+			"item": [
+				{
+					"name": "Get All Employees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Employee by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/{{employeeId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"{{employeeId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Employee by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/by-email/{{employeeEmail}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"by-email",
+								"{{employeeEmail}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Employee by Department",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/by-department/{{departmentId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"by-department",
+								"{{departmentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Employee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomFirstName = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const randomLastName = pm.variables.replaceIn('{{$randomLastName}}');",
+									"const randomPhoneNumber = pm.variables.replaceIn('{{$randomPhoneNumber}}');",
+									"const randomStreetAddress = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+									"const randomJobTitle = pm.variables.replaceIn('{{$randomJobTitle}}');",
+									"const employeeEmail = pm.variables.replaceIn('{{$randomEmail}}');",
+									"const randomInt = pm.variables.replaceIn('{{$randomInt}}');",
+									"",
+									"pm.collectionVariables.set('randomFirstName', randomFirstName);",
+									"pm.collectionVariables.set('randomLastName', randomLastName);",
+									"pm.collectionVariables.set('randomPhoneNumber', randomPhoneNumber);",
+									"pm.collectionVariables.set('randomStreetAddress', randomStreetAddress);",
+									"pm.collectionVariables.set('randomJobTitle', randomJobTitle);",
+									"pm.collectionVariables.set('employeeEmail', employeeEmail);",
+									"pm.collectionVariables.set('randomInt', randomInt);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set('employeeId', response.id);",
+									"pm.collectionVariables.set('employeeEmail', response.email);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"{{randomFirstName}}\",\n    \"lastName\": \"{{randomLastName}}\",\n    \"gender\": 1,\n    \"email\": \"{{employeeEmail}}\",\n    \"phoneNumber\" : \"{{randomPhoneNumber}}\",\n    \"address\" : \"{{randomStreetAddress}}\",\n    \"position\" : \"{{randomJobTitle}}\",\n    \"salary\" : {{randomInt}},\n    \"departmentId\": {{departmentId}},\n    \"hireDate\" : \"2025-05-26T19:50:34.4400000Z\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/employees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomPhoneNumber = pm.variables.replaceIn('{{$randomPhoneNumber}}');",
+									"const randomStreetAddress = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+									"const randomJobTitle = pm.variables.replaceIn('{{$randomJobTitle}}');",
+									"const randomInt = pm.variables.replaceIn('{{$randomInt}}');",
+									"",
+									"pm.collectionVariables.set('randomPhoneNumber', randomPhoneNumber);",
+									"pm.collectionVariables.set('randomStreetAddress', randomStreetAddress);",
+									"pm.collectionVariables.set('randomJobTitle', randomJobTitle);",
+									"pm.collectionVariables.set('randomInt', randomInt);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phoneNumber\" : \"{{randomPhoneNumber}}\",\n    \"address\" : \"{{randomStreetAddress}}\",\n    \"position\" : \"{{randomJobTitle}}\",\n    \"salary\" : {{randomInt}},\n    \"departmentId\": 1\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/{{employeeId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"{{employeeId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/{{employeeId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"{{employeeId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Employees",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/mageas/Downloads/import-employees.xlsx"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/import",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"import"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Employees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/employees/export",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"employees",
+								"export"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LeaveRequest",
+			"item": [
+				{
+					"name": "Get All LeaveRequests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LeaveRequests by Employee",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/employee/{{employeeEmail}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"employee",
+								"{{employeeEmail}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LeaveRequests by Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/status/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"status",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending LeaveRequests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/pending",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One LeaveRequest",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/{{leaveRequestId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"{{leaveRequestId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create LeaveRequest",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set('leaveRequestId', response.id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"leaveType\": 1,\n    \"startDate\": \"2025-11-26\",\n    \"endDate\": \"2025-11-27\",\n    \"reason\": \"{{randomLoremParagraph}}\",\n    \"employeeId\": {{employeeId}}\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"managerComments\": \"{{randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/{{leaveRequestId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"{{leaveRequestId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve LeaveRequest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/{{leaveRequestId}}/approve",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"{{leaveRequestId}}",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject LeaveRequest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/{{leaveRequestId}}/reject",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"{{leaveRequestId}}",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete LeaveRequest",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/leaveRequests/{{leaveRequestId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"leaveRequests",
+								"{{leaveRequestId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance",
+			"item": [
+				{
+					"name": "Get All Attendances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendances by Employee",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/employee/{{employeeId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"employee",
+								"{{employeeId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendances by Employee And Date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/employee/{{employeeId}}/date/2025-11-26",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"employee",
+								"{{employeeId}}",
+								"date",
+								"2025-11-26"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendances by Date range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/date-range?startDate=2025-11-26&endDate=2025-11-27",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-11-26"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-11-27"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Attendance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/{{attendanceId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"{{attendanceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set('attendanceId', response.id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2025-11-26T19:50:34.4400000Z\",\n    \"clockIn\": \"09:00:00\",\n    \"clockOut\": \"17:30:00\",\n    \"breakDuration\": \"01:00:00\",\n    \"notes\": \"{{randomLoremParagraph}}\",\n    \"employeeId\": {{employeeId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attendance",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomLoremParagraph = pm.variables.replaceIn('{{$randomLoremParagraph}}');",
+									"",
+									"pm.collectionVariables.set('randomLoremParagraph', randomLoremParagraph);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clockIn\": \"09:00:00\",\n    \"clockOut\": \"17:30:00\",\n    \"breakDuration\": \"01:00:00\",\n    \"notes\": \"{{randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/{{attendanceId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"{{attendanceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Attendance",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{api}}/attendances/{{attendanceId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{api}}",
+								"attendances",
+								"{{attendanceId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/health",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "signup_email",
+			"value": ""
+		},
+		{
+			"key": "signup_password",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "userName",
+			"value": ""
+		},
+		{
+			"key": "employeeEmail",
+			"value": ""
+		},
+		{
+			"key": "departmentId",
+			"value": ""
+		},
+		{
+			"key": "randomJobArea",
+			"value": ""
+		},
+		{
+			"key": "randomJobAreaUpper",
+			"value": ""
+		},
+		{
+			"key": "randomLoremParagraph",
+			"value": ""
+		},
+		{
+			"key": "randomFirstName",
+			"value": ""
+		},
+		{
+			"key": "randomLastName",
+			"value": ""
+		},
+		{
+			"key": "randomPhoneNumber",
+			"value": ""
+		},
+		{
+			"key": "randomStreetAddress",
+			"value": ""
+		},
+		{
+			"key": "randomJobTitle",
+			"value": ""
+		},
+		{
+			"key": "randomInt",
+			"value": ""
+		},
+		{
+			"key": "employeeId",
+			"value": ""
+		},
+		{
+			"key": "leaveRequestId",
+			"value": ""
+		},
+		{
+			"key": "attendanceId",
+			"value": ""
+		}
+	]
+}
