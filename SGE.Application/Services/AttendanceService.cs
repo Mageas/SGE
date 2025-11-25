@@ -41,7 +41,9 @@ public class AttendanceService(
     public async Task<IEnumerable<AttendanceDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate,
         CancellationToken cancellationToken = default)
     {
-        var list = await attendanceRepository.GetByDateRangeAsync(startDate, endDate, cancellationToken);
+        var startUtc = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+        var endUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+        var list = await attendanceRepository.GetByDateRangeAsync(startUtc, endUtc, cancellationToken);
         return mapper.Map<IEnumerable<AttendanceDto>>(list);
     }
 
