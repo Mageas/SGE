@@ -63,7 +63,7 @@ public class LeaveRequest : BaseEntity
     /// Represents the unique identifier of the employee associated with the current leave request.
     /// This property establishes a relationship between the leave request and a specific employee.
     /// </summary>
-    public int EmployeeId { get; set; }
+    public int? EmployeeId { get; set; }
 
     /// <summary>
     /// Represents an employee with detailed information such as
@@ -71,5 +71,5 @@ public class LeaveRequest : BaseEntity
     /// hire details, and relationships with other entities like
     /// attendance records, department, and leave requests.
     /// </summary>
-    public virtual Employee Employee { get; set; } = null!;
+    public virtual Employee? Employee { get; set; }
 }

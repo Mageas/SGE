@@ -57,12 +57,12 @@ public class Employee : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier of the department associated with the employee.
     /// </summary>
-    public int DepartmentId { get; set; }
+    public int? DepartmentId { get; set; }
 
     /// <summary>
     /// Gets or sets the department associated with the employee.
     /// </summary>
-    public virtual Department Department { get; set; } = null!;
+    public virtual Department? Department { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of attendance records associated with the employee.

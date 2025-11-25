@@ -40,12 +40,12 @@ public class RefreshToken
     /// <summary>
     ///     Represents the identifier of the user associated with the refresh token.
     /// </summary>
-    public string UserId { get; set; } = string.Empty;
+    public string? UserId { get; set; }
 
     /// <summary>
     ///     Represents the user associated with the refresh token.
     /// </summary>
-    public ApplicationUser User { get; set; } = null!;
+    public ApplicationUser? User { get; set; }
 
     /// <summary>
     ///     Indicates whether the refresh token has expired based on the current UTC time and the expiration date.

@@ -74,7 +74,7 @@ public class Attendance : BaseEntity
     /// This property uniquely links an attendance entry to a particular employee.
     /// It acts as a foreign key in the relationship between the Attendance and Employee entities.
     /// </remarks>
-    public int EmployeeId { get; set; }
+    public int? EmployeeId { get; set; }
     
     /// <summary>
     /// Represents an employee within the organization.
@@ -83,5 +83,5 @@ public class Attendance : BaseEntity
     /// This property establishes the relationship between an attendance record and its associated employee.
     /// It serves to identify the employee for whom the attendance data is recorded.
     /// </remarks>
-    public virtual Employee Employee { get; set; } = null!;
+    public virtual Employee? Employee { get; set; }
 }
