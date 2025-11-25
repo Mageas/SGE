@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using SGE.Core.Enums;
+using SGE.Core.Exceptions;
 
 namespace SGE.Application.DTOs.Employees;
 
@@ -31,7 +32,7 @@ public partial class EmployeeCreateDto
         init
         {
             if (value.Length <= 2)
-                throw new ArgumentException("First name must be at least 2 characters long.", nameof(value));
+                throw new ValidationException(nameof(FirstName), "First name must be at least 2 characters long.");
 
             _firstName = value;
         }
@@ -42,7 +43,7 @@ public partial class EmployeeCreateDto
         get => _lastName;
         init
         {
-            if (value.Length <= 2) throw new ArgumentException("Last name must be at least 2 characters long.");
+            if (value.Length <= 2) throw new ValidationException(nameof(LastName), "Last name must be at least 2 characters long.");
 
             _lastName = value;
         }
@@ -54,7 +55,7 @@ public partial class EmployeeCreateDto
         init
         {
             if (!Enum.IsDefined(typeof(Gender), value))
-                throw new ArgumentOutOfRangeException("Gender value must be a valid Gender enum value.");
+                throw new ValidationException(nameof(Gender), "Gender value must be a valid Gender enum value.");
 
             _gender = value;
         }
@@ -66,7 +67,7 @@ public partial class EmployeeCreateDto
         init
         {
             var regex = EmailRegex();
-            if (!regex.IsMatch(value)) throw new ArgumentException("Email must be a valid email.");
+            if (!regex.IsMatch(value)) throw new ValidationException(nameof(Email), "Email must be a valid email.");
 
             _email = value;
         }

@@ -79,6 +79,9 @@ public class GlobalExceptionHandlingMiddleware
                 NotClockedInException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
                 AttendanceException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
 
+                // 500 Internal Server Error Exceptions
+                ConfigurationException ex => ErrorResponse.Create(ex.Message, ex.ErrorCode, ex.StatusCode, traceId),
+
                 // Generic SGE Exception
                 SgeException sgeException => ErrorResponse.Create(sgeException.Message, sgeException.ErrorCode,
                     sgeException.StatusCode, traceId),

@@ -1,3 +1,5 @@
+using SGE.Core.Exceptions;
+
 namespace SGE.Application.DTOs.Departments;
 
 public class DepartmentCreateDto
@@ -14,7 +16,7 @@ public class DepartmentCreateDto
         {
             if (value.Length <= 2)
             {
-                throw new ArgumentException("Name must be at least 2 characters long.");
+                throw new ValidationException(nameof(Name), "Name must be at least 2 characters long.");
             }
 
             _name = value;
@@ -34,7 +36,7 @@ public class DepartmentCreateDto
             if (value.Length <= 2 || value.Length > 10)
 
             {
-                throw new ArgumentException("Code must be at least 2 characters long and max 10 characters long.");
+                throw new ValidationException(nameof(Code), "Code must be at least 2 characters long and max 10 characters long.");
             }
 
             _code = value;
