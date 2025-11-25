@@ -70,7 +70,7 @@ public partial class EmployeeCreateDto
             var regex = EmailRegex();
             if (!regex.IsMatch(value)) throw new ValidationException(nameof(Email), "Email must be a valid email.");
 
-            _email = value;
+            _email = value.ToLower();
         }
     }
 

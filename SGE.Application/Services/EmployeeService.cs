@@ -92,7 +92,7 @@ public class EmployeeService(
         if (department == null)
             throw new DepartmentNotFoundException(dto.DepartmentId);
 
-        var existingEmployee = await employeeRepository.GetByEmailAsync(dto.Email, cancellationToken);
+        var existingEmployee = await employeeRepository.GetByEmailAsync(dto.Email.ToLower(), cancellationToken);
         if (existingEmployee != null)
             throw new InvalidEmployeeDataException(
                 $"L'adresse email '{dto.Email}' est déjà utilisée par un autre employé.");
