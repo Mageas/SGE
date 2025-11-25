@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.LeaveRequests;
 using SGE.Application.Interfaces.Services;
-using SGE.Core.Entities;
 
 namespace SGE.API.Controllers;
 
 /// <summary>
-/// Controller for managing employee leave requests.
+///     Controller for managing employee leave requests.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -30,14 +29,16 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpGet("employee/{employeeId:int}")]
-    public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByEmployeeId(int employeeId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByEmployeeId(int employeeId,
+        CancellationToken cancellationToken)
     {
         var leaveRequests = await leaveRequestService.GetByEmployeeIdAsync(employeeId, cancellationToken);
         return Ok(leaveRequests);
     }
 
     [HttpGet("status/{status:int}")]
-    public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByStatus(int status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<LeaveRequestDto>>> GetByStatus(int status,
+        CancellationToken cancellationToken)
     {
         var leaveRequests = await leaveRequestService.GetByStatusAsync(status, cancellationToken);
         return Ok(leaveRequests);
@@ -51,7 +52,8 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     }
 
     [HttpPost]
-    public async Task<ActionResult<LeaveRequestDto>> Create(LeaveRequestCreateDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<LeaveRequestDto>> Create(LeaveRequestCreateDto dto,
+        CancellationToken cancellationToken)
     {
         var created = await leaveRequestService.CreateAsync(dto, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -86,29 +88,6 @@ public class LeaveRequestsController(ILeaveRequestService leaveRequestService) :
     {
         await leaveRequestService.DeleteAsync(id, cancellationToken);
         return NoContent();
-    }
-
-    [HttpPost("import")]
-    [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
-    {
-        if (fileUploadModel == null) return BadRequest("No file uploaded");
-        if (fileUploadModel.File.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            return BadRequest("File is not a valid Excel file");
-
-        var createdDtos = await leaveRequestService.ImportFile(fileUploadModel);
-        return Ok(createdDtos);
-    }
-
-    [HttpGet("export")]
-    public async Task<IActionResult> Export(CancellationToken cancellationToken)
-    {
-        var excelData = await leaveRequestService.ExportToExcelAsync(cancellationToken);
-        return File(
-            excelData,
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"LeaveRequests_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-        );
     }
 }
 

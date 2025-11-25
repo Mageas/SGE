@@ -2,8 +2,6 @@ using AutoMapper;
 using SGE.Application.DTOs.LeaveRequests;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
-using SGE.Application.Services.Readers;
-using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 using SGE.Core.Enums;
 using SGE.Core.Exceptions;
@@ -65,13 +63,15 @@ public class LeaveRequestService(
 
         // Validation des dates
         if (startDate < DateTime.UtcNow.Date)
-            throw new InvalidLeaveRequestDataException($"La date de début ({startDate:yyyy-MM-dd}) ne peut pas être dans le passé.");
+            throw new InvalidLeaveRequestDataException(
+                $"La date de début ({startDate:yyyy-MM-dd}) ne peut pas être dans le passé.");
 
         if (endDate < startDate)
-            throw new InvalidLeaveRequestDataException($"La date de fin ({endDate:yyyy-MM-dd}) doit être postérieure ou égale à la date de début ({startDate:yyyy-MM-dd}).");
+            throw new InvalidLeaveRequestDataException(
+                $"La date de fin ({endDate:yyyy-MM-dd}) doit être postérieure ou égale à la date de début ({startDate:yyyy-MM-dd}).");
 
         var entity = mapper.Map<LeaveRequest>(dto);
-        
+
         // Utiliser les dates normalisées
         entity.StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
         entity.EndDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
@@ -156,88 +156,5 @@ public class LeaveRequestService(
 
         await leaveRequestRepository.DeleteAsync(id, cancellationToken);
         return true;
-    }
-
-    public async Task<List<LeaveRequestDto>> ImportFile(FileUploadModel fileUploadModel)
-    {
-        var excelReader = new ExcelReader();
-        var rows = excelReader.Read(fileUploadModel.File);
-
-        var createdDtos = new List<LeaveRequestDto>();
-        var errors = new List<string>();
-
-        for (var i = 0; i < rows.Count; i++)
-        {
-            var row = rows[i];
-            var rowNumber = i + 2;
-
-            try
-            {
-                if (!int.TryParse(row["employeeid"], out var employeeId))
-                {
-                    errors.Add($"Ligne {rowNumber}: EmployeeId invalide '{row["employeeid"]}'");
-                    continue;
-                }
-
-                if (!int.TryParse(row["leavetype"], out var leaveType))
-                {
-                    errors.Add($"Ligne {rowNumber}: LeaveType invalide '{row["leavetype"]}'");
-                    continue;
-                }
-
-                if (!DateTime.TryParse(row["startdate"], out var startDate))
-                {
-                    errors.Add($"Ligne {rowNumber}: StartDate invalide '{row["startdate"]}'");
-                    continue;
-                }
-
-                if (!DateTime.TryParse(row["enddate"], out var endDate))
-                {
-                    errors.Add($"Ligne {rowNumber}: EndDate invalide '{row["enddate"]}'");
-                    continue;
-                }
-
-                startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
-                endDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
-
-                var dto = new LeaveRequestCreateDto
-                {
-                    EmployeeId = employeeId,
-                    LeaveType = leaveType,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    Reason = row.ContainsKey("reason") ? row["reason"] : string.Empty
-                };
-
-                var created = await CreateAsync(dto);
-                createdDtos.Add(created);
-            }
-            catch (SgeException ex)
-            {
-                errors.Add($"Ligne {rowNumber}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"Ligne {rowNumber}: Erreur inattendue - {ex.Message}");
-            }
-        }
-
-        if (errors.Any())
-        {
-            var validationErrors = new Dictionary<string, List<string>>
-            {
-                { "Import", errors }
-            };
-            throw new ValidationException(validationErrors);
-        }
-
-        return createdDtos;
-    }
-
-    public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)
-    {
-        var excelWriter = new ExcelWriter();
-        var leaveRequests = await GetAllAsync(cancellationToken);
-        return excelWriter.Write(leaveRequests.ToList(), "LeaveRequests");
     }
 }
