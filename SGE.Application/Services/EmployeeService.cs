@@ -1,4 +1,3 @@
-using System.Globalization;
 using AutoMapper;
 using SGE.Application.DTOs.Employees;
 using SGE.Application.Interfaces.Repositories;
@@ -230,7 +229,7 @@ public class EmployeeService(
                     LastName = row["lastname"],
                     Gender = gender,
                     Email = row["email"],
-                    PhoneNumber = row.ContainsKey("phonenumber") ? row["phonenumber"] : null,
+                    PhoneNumber = row.TryGetValue("phonenumber", out var value) ? value : null,
                     Address = row.ContainsKey("address") ? row["address"] : null,
                     Position = row.ContainsKey("position") ? row["position"] : null,
                     Salary = salary,
@@ -267,7 +266,6 @@ public class EmployeeService(
         var departments = await GetAllAsync(cancellationToken);
         return excelWriter.Write(departments.ToList(), "Employees");
     }
-
 
 
     /// <summary>

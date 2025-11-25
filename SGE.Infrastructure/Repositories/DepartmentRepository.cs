@@ -34,7 +34,7 @@ public class DepartmentRepository : Repository<Department>, IDepartmentRepositor
     /// </returns>
     public async Task<Department?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(d => d.Name == name,
+        return await DbSet.FirstOrDefaultAsync(d => d.Name == name,
             cancellationToken);
     }
 
@@ -49,7 +49,7 @@ public class DepartmentRepository : Repository<Department>, IDepartmentRepositor
     /// </returns>
     public async Task<Department?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(d => d.Code == code,
+        return await DbSet.FirstOrDefaultAsync(d => d.Code == code,
             cancellationToken);
     }
 }

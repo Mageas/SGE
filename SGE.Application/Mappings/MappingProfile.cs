@@ -14,7 +14,7 @@ public class MappingProfile : Profile
         CreateMap<Department, DepartmentDto>();
         CreateMap<DepartmentCreateDto, Department>();
         CreateMap<DepartmentUpdateDto, Department>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember)
+            .ForAllMembers(opts => opts.Condition((_, _, srcMember)
                 => srcMember != null));
 
         CreateMap<Employee, EmployeeDto>()
@@ -24,7 +24,7 @@ public class MappingProfile : Profile
                 opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty));
         CreateMap<EmployeeCreateDto, Employee>();
         CreateMap<EmployeeUpdateDto, Employee>().ForAllMembers(opts =>
-            opts.Condition((src, dest, srcMember) => srcMember != null)); // ignore nulls
+            opts.Condition((_, _, srcMember) => srcMember != null)); // ignore nulls
 
         // Attendance mappings
         CreateMap<Attendance, AttendanceDto>()
@@ -33,7 +33,7 @@ public class MappingProfile : Profile
                     src.Employee != null ? $"{src.Employee.FirstName} {src.Employee.LastName}" : string.Empty));
         CreateMap<AttendanceCreateDto, Attendance>();
         CreateMap<AttendanceUpdateDto, Attendance>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            .ForAllMembers(opts => opts.Condition((_, _, srcMember) => srcMember != null));
 
         // LeaveRequest mappings
         CreateMap<LeaveRequest, LeaveRequestDto>()
@@ -42,6 +42,6 @@ public class MappingProfile : Profile
                     src.Employee != null ? $"{src.Employee.FirstName} {src.Employee.LastName}" : string.Empty));
         CreateMap<LeaveRequestCreateDto, LeaveRequest>();
         CreateMap<LeaveRequestUpdateDto, LeaveRequest>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            .ForAllMembers(opts => opts.Condition((_, _, srcMember) => srcMember != null));
     }
 }

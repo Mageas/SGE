@@ -17,14 +17,14 @@ public partial class EmployeeCreateDto
     private readonly string _firstName = string.Empty;
 
     /// <summary>
-    ///     Gets or sets the last name of the employee.
-    /// </summary>
-    private readonly string _lastName = string.Empty;
-
-    /// <summary>
     ///     Gets or sets the gender of the employee.
     /// </summary>
     private readonly int _gender;
+
+    /// <summary>
+    ///     Gets or sets the last name of the employee.
+    /// </summary>
+    private readonly string _lastName = string.Empty;
 
     public string FirstName
     {
@@ -43,7 +43,8 @@ public partial class EmployeeCreateDto
         get => _lastName;
         init
         {
-            if (value.Length <= 2) throw new ValidationException(nameof(LastName), "Last name must be at least 2 characters long.");
+            if (value.Length <= 2)
+                throw new ValidationException(nameof(LastName), "Last name must be at least 2 characters long.");
 
             _lastName = value;
         }
@@ -76,17 +77,17 @@ public partial class EmployeeCreateDto
     /// <summary>
     ///     Gets or sets the phone number associated with the employee.
     /// </summary>
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the address of the employee.
     /// </summary>
-    public string Address { get; set; } = string.Empty;
+    public string? Address { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the position or job title of the employee.
     /// </summary>
-    public string Position { get; set; } = string.Empty;
+    public string? Position { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the salary of the employee.

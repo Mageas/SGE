@@ -26,7 +26,7 @@ public class ExcelReader
             var columnNames = new List<string>();
             for (var i = 0; i < table.Columns.Count; i++)
             {
-                var columnName = table.Rows[0][i]?.ToString() ?? $"Column{i}";
+                var columnName = table.Rows[0][i].ToString() ?? $"Column{i}";
                 columnNames.Add(columnName.ToLower());
             }
 
@@ -37,7 +37,7 @@ public class ExcelReader
                 var rowData = new Dictionary<string, string>();
 
                 for (var colIndex = 0; colIndex < columnNames.Count; colIndex++)
-                    rowData[columnNames[colIndex]] = row[colIndex]?.ToString() ?? string.Empty;
+                    rowData[columnNames[colIndex]] = row[colIndex].ToString() ?? string.Empty;
 
                 allData.Add(rowData);
             }

@@ -6,7 +6,7 @@ using SGE.Infrastructure.Data;
 namespace SGE.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository implementation for Attendance entity operations.
+///     Repository implementation for Attendance entity operations.
 /// </summary>
 public class AttendanceRepository : Repository<Attendance>, IAttendanceRepository
 {
@@ -16,7 +16,7 @@ public class AttendanceRepository : Repository<Attendance>, IAttendanceRepositor
 
     public new async Task<IEnumerable<Attendance>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .AsNoTracking()
             .Include(a => a.Employee)
             .ToListAsync(cancellationToken);
@@ -24,14 +24,15 @@ public class AttendanceRepository : Repository<Attendance>, IAttendanceRepositor
 
     public new async Task<Attendance?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .Include(a => a.Employee)
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Attendance>> GetByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Attendance>> GetByEmployeeIdAsync(int employeeId,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .AsNoTracking()
             .Where(a => a.EmployeeId == employeeId)
             .Include(a => a.Employee)
@@ -39,16 +40,18 @@ public class AttendanceRepository : Repository<Attendance>, IAttendanceRepositor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Attendance?> GetByEmployeeAndDateAsync(int employeeId, DateTime date, CancellationToken cancellationToken = default)
+    public async Task<Attendance?> GetByEmployeeAndDateAsync(int employeeId, DateTime date,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .Include(a => a.Employee)
             .FirstOrDefaultAsync(a => a.EmployeeId == employeeId && a.Date.Date == date.Date, cancellationToken);
     }
 
-    public async Task<IEnumerable<Attendance>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Attendance>> GetByDateRangeAsync(DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .AsNoTracking()
             .Where(a => a.Date >= startDate && a.Date <= endDate)
             .Include(a => a.Employee)

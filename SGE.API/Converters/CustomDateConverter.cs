@@ -12,10 +12,7 @@ public class CustomDateConverter : JsonConverter<DateTime>
         var dateStr = reader.GetString();
         var date = DateHelper.ParseDate(dateStr);
 
-        if (date.HasValue)
-            return date.Value;
-
-        throw new DateTimeFormatException(dateStr);
+        return date ?? throw new DateTimeFormatException(dateStr);
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
