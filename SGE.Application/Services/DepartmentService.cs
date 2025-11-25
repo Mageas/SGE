@@ -2,8 +2,6 @@ using AutoMapper;
 using SGE.Application.DTOs.Departments;
 using SGE.Application.Interfaces.Repositories;
 using SGE.Application.Interfaces.Services;
-using SGE.Application.Services.Readers;
-using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 using SGE.Core.Exceptions;
 
@@ -88,69 +86,5 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IMapp
 
         await departmentRepository.DeleteAsync(entity.Id, cancellationToken);
         return true;
-    }
-
-    /// <summary>
-    ///     Import Department from Excel file
-    /// </summary>
-    /// <param name="fileUploadModel"></param>
-    /// <returns></returns>
-    public async Task<List<DepartmentDto>> ImportFile(FileUploadModel fileUploadModel)
-    {
-        var excelReader = new ExcelReader();
-        var rows = excelReader.Read(fileUploadModel.File);
-
-        var createdDtos = new List<DepartmentDto>();
-        var errors = new List<string>();
-
-        for (var i = 0; i < rows.Count; i++)
-        {
-            var row = rows[i];
-            var rowNumber = i + 2;
-
-            try
-            {
-                var dto = new DepartmentCreateDto
-                {
-                    Name = row["name"],
-                    Code = row["code"],
-                    Description = row["description"]
-                };
-
-                var created = await CreateAsync(dto);
-                createdDtos.Add(created);
-            }
-            catch (SgeException ex)
-            {
-                errors.Add($"Ligne {rowNumber}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"Ligne {rowNumber}: Erreur inattendue - {ex.Message}");
-            }
-        }
-
-        if (errors.Any())
-        {
-            var validationErrors = new Dictionary<string, List<string>>
-            {
-                { "Import", errors }
-            };
-            throw new ValidationException(validationErrors);
-        }
-
-        return createdDtos;
-    }
-
-    /// <summary>
-    ///     Export Departments to Excel
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<byte[]> ExportToExcelAsync(CancellationToken cancellationToken)
-    {
-        var excelWriter = new ExcelWriter();
-        var departments = await GetAllAsync(cancellationToken);
-        return excelWriter.Write(departments.ToList(), "Departments");
     }
 }

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.Attendances;
 using SGE.Application.Interfaces.Services;
-using SGE.Core.Entities;
 
 namespace SGE.API.Controllers;
 
@@ -81,28 +80,5 @@ public class AttendancesController(IAttendanceService attendanceService) : Contr
     {
         await attendanceService.DeleteAsync(id, cancellationToken);
         return NoContent();
-    }
-
-    [HttpPost("import")]
-    [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
-    {
-        if (fileUploadModel == null) return BadRequest("No file uploaded");
-        if (fileUploadModel.File.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            return BadRequest("File is not a valid Excel file");
-
-        var createdDtos = await attendanceService.ImportFile(fileUploadModel);
-        return Ok(createdDtos);
-    }
-
-    [HttpGet("export")]
-    public async Task<IActionResult> Export(CancellationToken cancellationToken)
-    {
-        var excelData = await attendanceService.ExportToExcelAsync(cancellationToken);
-        return File(
-            excelData,
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"Attendances_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-        );
     }
 }

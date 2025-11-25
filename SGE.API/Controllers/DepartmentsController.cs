@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Application.DTOs.Departments;
 using SGE.Application.Interfaces.Services;
-using SGE.Core.Entities;
 
 namespace SGE.API.Controllers;
 
@@ -95,40 +94,5 @@ public class DepartmentsController(IDepartmentService departmentService) : Contr
     {
         await departmentService.DeleteAsync(id, cancellationToken);
         return NoContent();
-    }
-
-    /// <summary>
-    ///     Import from a file
-    /// </summary>
-    /// <param name="fileUploadModel"></param>
-    /// <returns></returns>
-    [HttpPost("import")]
-    public async Task<ActionResult> ImportFile([FromForm] FileUploadModel? fileUploadModel)
-    {
-        if (fileUploadModel == null) return BadRequest("No file uploaded");
-
-        if (fileUploadModel.File.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            return BadRequest("File is not a valid Excel file");
-
-        var createdDtos = await departmentService.ImportFile(fileUploadModel);
-
-        return Ok(createdDtos);
-    }
-
-    /// <summary>
-    ///     Export Departments to Excel
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [HttpGet("export")]
-    public async Task<IActionResult> Export(CancellationToken cancellationToken)
-    {
-        var excelData = await departmentService.ExportToExcelAsync(cancellationToken);
-
-        return File(
-            excelData,
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"Departments_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-        );
     }
 }
