@@ -11,7 +11,7 @@ namespace SGE.Infrastructure.Data;
 public static class DbInitializer
 {
     /// <summary>
-    ///     Initializes the database with default roles and admin user.
+    ///     Initializes the database with default roles, admin user and manager user.
     /// </summary>
     /// <param name="serviceProvider">The service provider for dependency injection.</param>
     public static async Task InitializeAsync(IServiceProvider serviceProvider)
@@ -19,7 +19,7 @@ public static class DbInitializer
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        // Créer les rôles par défaut
+        // 1. Créer les rôles par défaut
         string[] roleNames = { "Admin", "Manager", "User" };
         foreach (var roleName in roleNames)
         {
@@ -30,7 +30,7 @@ public static class DbInitializer
             }
         }
 
-        // Créer un utilisateur admin par défaut
+        // 2. Créer un utilisateur ADMIN par défaut
         var adminEmail = "admin@sge.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -52,6 +52,33 @@ public static class DbInitializer
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(admin, "Admin");
+            }
+        }
+
+        // 3. Créer un utilisateur MANAGER par défaut (AJOUTÉ)
+        var managerEmail = "manager@sge.com";
+        var managerUser = await userManager.FindByEmailAsync(managerEmail);
+
+        if (managerUser == null)
+        {
+            var manager = new ApplicationUser
+            {
+                UserName = "manager",
+                Email = managerEmail,
+                FirstName = "Manager",
+                LastName = "System",
+                EmailConfirmed = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Création avec le mot de passe par défaut
+            var result = await userManager.CreateAsync(manager, "Manager123!");
+
+            if (result.Succeeded)
+            {
+                // Assignation du rôle Manager
+                await userManager.AddToRoleAsync(manager, "Manager");
             }
         }
     }
