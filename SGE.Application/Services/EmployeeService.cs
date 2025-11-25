@@ -7,6 +7,7 @@ using SGE.Application.Services.Readers;
 using SGE.Application.Services.Writers;
 using SGE.Core.Entities;
 using SGE.Core.Exceptions;
+using SGE.Core.Helpers;
 
 namespace SGE.Application.Services;
 
@@ -210,7 +211,7 @@ public class EmployeeService(
             if (!int.TryParse(row["departmentid"], out var departmentId))
                 lineErrors.Add($"ID Département invalide : '{row["departmentid"]}'.");
 
-            var hireDate = ParseDate(row["hiredate"]);
+            var hireDate = DateHelper.ParseDate(row["hiredate"]);
             if (!hireDate.HasValue)
                 lineErrors.Add(
                     $"Date d'embauche invalide : '{row["hiredate"]}'. Formats acceptés : dd/MM/yyyy, yyyy-MM-dd.");
@@ -267,29 +268,7 @@ public class EmployeeService(
         return excelWriter.Write(departments.ToList(), "Employees");
     }
 
-    private DateTime? ParseDate(string dateStr)
-    {
-        if (string.IsNullOrWhiteSpace(dateStr)) return null;
 
-        string[] formats =
-        {
-            // --- Formats date seule ---
-            "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy",
-
-            // --- Formats avec Heure:Minute (ex: 14:30) ---
-            "dd/MM/yyyy HH:mm", "yyyy-MM-dd HH:mm", "MM/dd/yyyy HH:mm", "dd-MM-yyyy HH:mm",
-            "yyyy-MM-ddTHH:mm", // Support ISO avec 'T'
-
-            // --- Formats avec Heure:Minute:Seconde (ex: 14:30:59) ---
-            "dd/MM/yyyy HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm:ss",
-            "yyyy-MM-ddTHH:mm:ss" // Support ISO avec 'T'
-        };
-
-        if (DateTime.TryParseExact(dateStr, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-            return DateTime.SpecifyKind(date, DateTimeKind.Utc);
-
-        return null;
-    }
 
     /// <summary>
     ///     Tries to generate a unique id until it finds one that is not already in use.
