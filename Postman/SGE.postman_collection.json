@@ -732,7 +732,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"{{randomFirstName}}\",\n    \"lastName\": \"{{randomLastName}}\",\n    \"gender\": 1,\n    \"email\": \"{{employeeEmail}}\",\n    \"phoneNumber\" : \"{{randomPhoneNumber}}\",\n    \"address\" : \"{{randomStreetAddress}}\",\n    \"position\" : \"{{randomJobTitle}}\",\n    \"salary\" : {{randomInt}},\n    \"departmentId\": {{departmentId}},\n    \"hireDate\" : \"2025-05-26T19:50:34.4400000Z\"\n}\n",
+							"raw": "{\n    \"firstName\": \"{{randomFirstName}}\",\n    \"lastName\": \"{{randomLastName}}\",\n    \"gender\": 1,\n    \"email\": \"{{employeeEmail}}\",\n    \"phoneNumber\" : \"{{randomPhoneNumber}}\",\n    \"address\" : \"{{randomStreetAddress}}\",\n    \"position\" : \"{{randomJobTitle}}\",\n    \"salary\" : {{randomInt}},\n    \"departmentId\": {{departmentId}},\n    \"hireDate\" : \"2025-05-26 01:00:00\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -838,7 +838,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/Users/mageas/Downloads/import-employees.xlsx"
+									"src": "postman-cloud:///1f0c9e56-ea00-4540-bac4-34922273eebd"
 								}
 							]
 						},
@@ -904,7 +904,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/{{api}}/leaveRequests/employee/{{employeeEmail}}",
+							"raw": "{{url}}/{{api}}/leaveRequests/employee/email/{{employeeEmail}}",
 							"host": [
 								"{{url}}"
 							],
@@ -912,6 +912,7 @@
 								"{{api}}",
 								"leaveRequests",
 								"employee",
+								"email",
 								"{{employeeEmail}}"
 							]
 						}
@@ -1304,7 +1305,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"date\": \"2025-11-26T19:50:34.4400000Z\",\n    \"clockIn\": \"09:00:00\",\n    \"clockOut\": \"17:30:00\",\n    \"breakDuration\": \"01:00:00\",\n    \"notes\": \"{{randomLoremParagraph}}\",\n    \"employeeId\": {{employeeId}}\n}",
+							"raw": "{\n    \"date\": \"2025-11-26 19:50:34\",\n    \"clockIn\": \"09:00:00\",\n    \"clockOut\": \"17:30:00\",\n    \"breakDuration\": \"01:00:00\",\n    \"notes\": \"{{randomLoremParagraph}}\",\n    \"employeeId\": {{employeeId}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
